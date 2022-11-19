@@ -1,0 +1,119 @@
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&display=swap");
+@import "~slick-carousel/slick/slick.css";
+@import "~slick-carousel/slick/slick-theme.css";
+
+:root {
+    --base-color: #0d1117;
+    --light-dark-color: #161b22;
+    --accent-color: #fab702;
+    --text-color: #eeeeee;
+}
+
+* {
+    font-family: "Bebas Neue", sans-serif;
+}
+*:focus {
+    outline: none;
+}
+
+p {
+    font-family: "Poppins", sans-serif !important;
+}
+
+body {
+    color: var(--text-color);
+    background-color: var(--base-color);
+    font-family: "Poppins", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+    min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+a,
+.price {
+    font-family: "Bebas Neue", "Times New Roman" !important;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.form div,
+.form span,
+.form a {
+    font-family: "Poppins", sans-serif !important;
+}
+
+input {
+    font-family: "Oswald", sans-serif !important;
+    letter-spacing: 1.2px;
+}
+
+.multi-select {
+    border-radius: 0 !important;
+    font-family: "Bebas Neue", "Poppins" !important;
+    color: var(--light-dark-color) !important;
+}
+
+.scroll-bar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+@media (max-width: 640px) {
+    .scroll-hidden-xs::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+@media (max-width: 767px) {
+    .scroll-hidden-sm::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.scroll-hidden::-webkit-scrollbar {
+    display: none;
+}
+
+.hide-scroll::-webkit-scrollbar {
+    display: none;
+}
+.show-scroll::-webkit-scrollbar {
+    display: block;
+}
+
+.scroll-bar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.scroll-bar::-webkit-scrollbar-thumb {
+    background: #3b3d3f;
+}
+
+/* Handle on hover */
+.scroll-bar::-webkit-scrollbar-thumb:hover {
+    background: #4d4f52;
+}
+
+.main-product-image > div div:last-child {
+    position: absolute !important;
+    left: -9px !important;
+}

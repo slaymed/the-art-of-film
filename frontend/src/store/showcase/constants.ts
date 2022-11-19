@@ -1,0 +1,5 @@
+// Prefixes
+export const FETCH_SELECTED_SELLER_SHOWCASE_PREFIX = "FETCH_SELECTED_SELLER_SHOWCASE_PREFIX";
+
+// Urls
+export const FETCH_SELECTED_SELLER_SHOWCASE_URL = "/api/seller-showcase/";

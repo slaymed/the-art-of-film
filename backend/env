@@ -1,0 +1,22 @@
+ENV=dev
+JWT_SECRET=MIIBOgIBAAJBAI0fsqrucsvXpwgtsAPHS2Jz56GQ8+lUSZgcNzX5p5C5d/iMxvuT
+PAYPAL_CLIENT_ID=AX2vaOdKOXYUCUOr4uiDrTAGRNCVzVKCbHcceKXPNnbDhy7tnEQzrInq7t5jgY4XowxAcjouKZ7GDhP6
+STRIPE_PRIVATE_KEY=sk_test_51F61rUBZLziDYSLq3QCTuid32WJCPE30nxxgceggF3Bmq6oTebT3wDV1wLiviHZqQOV30888YPTb8bagyfXcAFG093KvDhPFQ
+MONGODB_LOCALE_URI=mongodb://localhost:27017/artoffilms
+MONGODB_URI=mongodb+srv://aliarsalandev:DojWixpseipvty55@cluster0.qjxzx.mongodb.net/artoffilms?retryWrites=true&w=majority
+CLOUDINARY_CLOUD_NAME=theartoffilms
+CLOUDINARY_API_SECRET=u9PT2614sk7pwSpATGDQvWiVhg0
+CLOUDINARY_API_KEY=563822985559768
+CLOUDINARY_URL=cloudinary://563822985559768:u9PT2614sk7pwSpATGDQvWiVhg0@theartoffilms
+WEB_URL=http://localhost:3000
+
+
+# email smtp config
+
+MAIL_DRIVER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=v3rsion9@gmail.com
+MAIL_PASSWORD=xfzovkpqvpjqtoom
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=v3rsion9@gmail.com

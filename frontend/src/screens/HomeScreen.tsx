@@ -1,0 +1,222 @@
+import React, { FC, ComponentProps, useEffect } from "react";
+import classNames from "classnames";
+import { Link } from "react-router-dom";
+import Carousel from "react-elastic-carousel";
+import { useSelector } from "react-redux";
+
+import { useDispatch } from "../hooks/useDispatch";
+
+import data from "../data";
+
+import { fetchingProducts, productsSelector } from "../store/products/selectors";
+import { advertismentsSelector } from "../store/advertisments/selectors";
+import { fetchAdvertisment } from "../store/advertisments/thunk";
+import { topSellersSelector } from "../store/sellers/selectors";
+import { fetchProducts } from "../store/products/thunks";
+import { fetchTopSellers } from "../store/sellers/thunks";
+
+import HowItWorksSection from "../components/sections/HowItWorksSection";
+import ShowcaseSection from "../components/sections/ShowcaseSection";
+import WelcomeSection from "../components/sections/WelcomeSection";
+import Product from "../components/Product";
+import SectionCard from "../components/cards/SectionCard";
+import MessageBox from "../components/kits/MessageBox";
+import LoadingBox from "../components/kits/LoadingBox";
+import SearchBox from "../components/SearchBox";
+import H1 from "../components/elements/H1";
+import TextHeader from "../components/elements/TextHeader";
+
+// TODO: Redesigned using tailwind: Remove Comment When Pushing to production
+
+const CarouselComponent = Carousel as any;
+
+export interface HomeScreenProps extends ComponentProps<"div"> {}
+
+const HomeScreen: FC<HomeScreenProps> = ({ className = "", ...rest }) => {
+    const dispatch = useDispatch();
+
+    const products = useSelector(productsSelector).slice(0, 6);
+    const sellers = useSelector(topSellersSelector);
+    const advertisements = useSelector(advertismentsSelector);
+    const { loading, errors } = useSelector(fetchingProducts);
+
+    useEffect(() => {
+        dispatch(fetchProducts());
+        dispatch(fetchTopSellers());
+        dispatch(fetchAdvertisment());
+    }, [dispatch]);
+
+    return (
+        <div {...rest} className={classNames("", { [className]: className })}>
+            <div
+                className="relative h-[556px]"
+                style={{ backgroundImage: advertisements?.length > 0 ? `` : "url(/images/home.jpg)" }}
+            >
+                {Array.isArray(advertisements) &&
+                    advertisements?.map((advertisment) => (
+                        <div
+                            className="absolute inset-0 overflow-hidden bg-contain"
+                            style={{ backgroundImage: `url(${advertisment.image})` }}
+                            key={advertisment.link}
+                        >
+                            <a
+                                className="z-10 absolte bottom-5 right-5"
+                                href={advertisment.link}
+                                target="_blank"
+                                rel="noreferrer"
+                            >
+                                <i title="open" className="fa fa-window-maximize" />
+                                open
+                            </a>
+                        </div>
+                    ))}
+
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70">
+                    <div className="flex flex-col space-y-10">
+                        <H1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl text-center">
+                            <span className="text-accent">The Art Of</span> Film
+                        </H1>
+                        <TextHeader className="text-center text-xl sm:text-2xl md:text-3xl">
+                            A MOVIE POSTER COLLECTOR’S INDISPENSABLE TOOLKIT
+                        </TextHeader>
+                        <SearchBox />
+                    </div>
+                </div>
+            </div>
+
+            <WelcomeSection />
+            <HowItWorksSection />
+            <ShowcaseSection />
+
+            <div className="py-8 bg-light-dark flex flex-col items-center">
+                <div className="flex justify-center p-8">
+                    <TextHeader className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl">
+                        <span className="text-accent">Shop for</span> Posters
+                    </TextHeader>
+                </div>
+                <Link
+                    to="/shop/name"
+                    className="text-sm md:text-md py-2 px-8 sm:px-12 sm:py-4 tracking-wider text-black bg-accent"
+                >
+                    VISIT SHOP
+                </Link>
+                <br />
+                {loading ? (
+                    <LoadingBox />
+                ) : errors.message ? (
+                    <MessageBox variant="danger">{errors.message}</MessageBox>
+                ) : (
+                    <>
+                        {Array.isArray(products) && products.length === 0 && <MessageBox>No Posters Found</MessageBox>}
+                        <div className="flex p-8 w-full">
+                            <CarouselComponent
+                                breakPoints={[
+                                    { width: 2, itemsToShow: 1 },
+                                    { width: 960, itemsToShow: 2, itemsToScroll: 2 },
+                                    { width: 1440, itemsToShow: 3, itemsToScroll: 3 },
+                                ]}
+                            >
+                                {products.map(
+                                    (product) =>
+                                        product.image.length > 0 &&
+                                        product.visible && <Product toShop={true} key={product._id} product={product} />
+                                )}
+                            </CarouselComponent>
+                        </div>
+                    </>
+                )}
+            </div>
+
+            <div className="bg-base">
+                <SectionCard
+                    before="SUBSCRIBE"
+                    title="TO YOU TUBE"
+                    text="Sign up to The Art of Film YouTube channel today as we regularly upload movie poster related videos content that we know you will love. "
+                    linkText="SUBSCRIBE Today"
+                    link="https://www.youtube.com/watch?v=ofkryTjra7Q"
+                    type="video"
+                />
+            </div>
+
+            <div className="bg-light-dark flex flex-col items-center p-16 space-y-16">
+                <TextHeader className="text-4xl sm:text-5xl md:text-6xl">
+                    <span className="text-accent">Browse</span> Showcases
+                </TextHeader>
+
+                <div className="w-full">
+                    <CarouselComponent
+                        breakPoints={[
+                            { width: 2, itemsToShow: 1 },
+                            { width: 640, itemsToShow: 2, itemsToScroll: 2 },
+                            { width: 960, itemsToShow: 3 },
+                            { width: 1280, itemsToShow: 4 },
+                        ]}
+                    >
+                        {Array.isArray(sellers) &&
+                            sellers?.map((seller) => {
+                                if (!seller) return null;
+                                return (
+                                    <div className="bg-base p-4 w-full max-w-[300px]" key={seller._id}>
+                                        <ul className="bg-light-dark flex space-y-8 flex-col p-8 w-full items-center">
+                                            <li>
+                                                <Link
+                                                    className="text-2xl tracking-widest text-center text-accent"
+                                                    to={`/seller/${seller._id}`}
+                                                >
+                                                    {seller.name}
+                                                </Link>
+                                            </li>
+
+                                            <li className="w-full">
+                                                <div className="flex justify-between items-center">
+                                                    <div className="flex space-x-0.4">
+                                                        <span style={{ fontSize: "2.5rem" }}>
+                                                            <img
+                                                                width="32px"
+                                                                src={
+                                                                    (seller.country && data.flags[seller.country]) ??
+                                                                    "https://upload.wikimedia.org/wikipedia/commons/b/b0/No_flag.svg"
+                                                                }
+                                                                alt={seller.name}
+                                                            />
+                                                        </span>
+                                                        <span className="ml-2">
+                                                            {
+                                                                data.stripe_origins.find(
+                                                                    (stripe_origin) =>
+                                                                        stripe_origin.code === seller.country
+                                                                )?.name
+                                                            }
+                                                        </span>
+                                                    </div>
+                                                    <Link className="text-lg text-accent" to={`/seller/${seller._id}`}>
+                                                        <i className="fas fa-arrow-right" />
+                                                    </Link>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                );
+                            })}
+                    </CarouselComponent>
+                </div>
+                {/* <CoverFlowComponent
+            imagesArr={sellers?.map(({ seller }) => seller.logo)}
+            direction="horizontal"
+            width={`${isMobile ? "100%" : "100%"}`}
+            height={`${isMobile ? "100%" : 425}`}
+            itemRatio="21:14"
+            background="transparent"
+            onClick={(seller) => {}}
+            handleSelect={(index) => {
+              const _seller = sellers?.find((seller, ind) => ind === index);
+              navigate(`/seller/${_seller?._id}`);
+            }}
+            labelsArr={sellers?.map(({ seller }) => seller.name)}
+          /> */}
+            </div>
+        </div>
+    );
+};
+
+export default HomeScreen;
