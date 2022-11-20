@@ -11,17 +11,17 @@ import {
     DELETE_POSTER_URL,
     FETCH_MY_PRODUCTS_PREFIX,
     FETCH_MY_PRODUCTS_URL,
-    FETCH_PRODUCTS_PREFIX,
-    FETCH_PRODUCTS_URL,
+    FETCH_HOME_PRODUCTS_PREFIX,
+    FETCH_HOME_PRODUCTS_URL,
     FETCH_PRODUCT_PREFIX,
     FETCH_PRODUCT_URL,
     UPDATE_POSTER_PREFIX,
     UPDATE_POSTER_URL,
 } from "./constants";
 
-export const fetchProducts = createAsyncThunk(FETCH_PRODUCTS_PREFIX, async (_, { rejectWithValue }) => {
+export const fetchHomeProducts = createAsyncThunk(FETCH_HOME_PRODUCTS_PREFIX, async (_, { rejectWithValue }) => {
     try {
-        const res = await axios.get(FETCH_PRODUCTS_URL);
+        const res = await axios.get(FETCH_HOME_PRODUCTS_URL);
 
         return { status: RequestLifeCycle.SUCCESS, data: res.data as IProduct[] };
     } catch (errors) {

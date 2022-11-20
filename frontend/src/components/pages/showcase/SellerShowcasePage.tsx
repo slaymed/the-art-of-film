@@ -1,22 +1,27 @@
-import React, { FC, ComponentProps, useState } from "react";
+import React, { FC, ComponentProps, useEffect } from "react";
 import classNames from "classnames";
 import { useSelector } from "react-redux";
 
 import { IShowcase } from "../../../store/showcase/types";
-import { User } from "../../../store/auth/types";
 import { selectedShowcaseProduct } from "../../../store/showcase/selectors";
 
 import Paragraph from "../../elements/Paragraph";
 import ProductPage from "../products/ProductPage";
 import ShowcaseProducts from "./ShowcaseProducts";
 
+import { useDispatch } from "../../../hooks/useDispatch";
+import { selectShowcaseProduct } from "../../../store/showcase/actions";
+
 export interface SellerShowcasePageProps extends ComponentProps<"div"> {
     showcase: IShowcase;
-    user: User;
 }
 
-const SellerShowcasePage: FC<SellerShowcasePageProps> = ({ className = "", showcase, user, ...rest }) => {
+const SellerShowcasePage: FC<SellerShowcasePageProps> = ({ className = "", showcase, ...rest }) => {
+    const dispatch = useDispatch();
+
     const product = useSelector(selectedShowcaseProduct);
+
+    useEffect(() => dispatch(selectShowcaseProduct(null)), []);
 
     return (
         <div {...rest} className={classNames("w-full flex flex-col gap-8 sm:gap-16", { [className]: className })}>
@@ -24,7 +29,7 @@ const SellerShowcasePage: FC<SellerShowcasePageProps> = ({ className = "", showc
                 {showcase.seller.name}
             </Paragraph>
 
-            <ShowcaseProducts showcase={showcase} user={user} />
+            <ShowcaseProducts showcase={showcase} />
 
             {product && <ProductPage product={product} reverse className="px-8 sm:px-16 pb-8 sm:pb-16" />}
         </div>

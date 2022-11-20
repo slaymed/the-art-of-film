@@ -1,6 +1,5 @@
 import React, { FC, ComponentProps } from "react";
 import classNames from "classnames";
-import TextHeader from "../elements/TextHeader";
 
 export interface LoadingBoxProps extends ComponentProps<"div"> {}
 

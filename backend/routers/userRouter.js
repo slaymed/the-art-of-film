@@ -19,19 +19,6 @@ import UserStripeInfo from "../models/userStripeInfoModal.js";
 const userRouter = express.Router();
 
 userRouter.get(
-    "/top-sellers",
-    expressAsyncHandler(async (req, res) => {
-        try {
-            const topSellers = await User.find({ isSeller: true }).sort({ "seller.rating": -1 }).limit(3);
-
-            return res.status(200).json(topSellers);
-        } catch (error) {
-            return res.status(500).json(error);
-        }
-    })
-);
-
-userRouter.get(
     "/authenticated",
     isAuth,
     expressAsyncHandler(async (req, res) => {
@@ -84,7 +71,10 @@ userRouter.post(
 
             res.cookie("access_token", token, { httpOnly: true, maxAge: 1000 * 60 * 60 * 24 * 30 });
 
-            if (req.body.socketId) await new Socket({ socketId: req.body.socketId, user: user._id }).save();
+            if (req.body.socketId) {
+                const found = await Socket.findOne({ socketId: req.body.socketId });
+                if (!found) await new Socket({ socketId: req.body.socketId, user: user._id }).save();
+            }
 
             return res.status(200).json(user);
         } catch (error) {
@@ -117,8 +107,20 @@ userRouter.post(
     "/update",
     isAuth,
     expressAsyncHandler(async (req, res) => {
-        const { name, password, sellerName, email, logo, description, address, city, country, code, postalCode } =
-            req.body;
+        const {
+            name,
+            password,
+            sellerName,
+            email,
+            logo,
+            description,
+            address,
+            city,
+            country,
+            code,
+            postalCode,
+            rolled_folded_shipping_cost,
+        } = req.body;
         try {
             const user = await User.findById(req.user._id);
 
@@ -133,6 +135,7 @@ userRouter.post(
             if (country) user.country = country;
             if (code) user.code = code;
             if (postalCode) user.postalCode = postalCode;
+            if (rolled_folded_shipping_cost) user.rolled_folded_shipping_cost = rolled_folded_shipping_cost;
 
             return res.status(200).json(await user.save());
         } catch (error) {
@@ -192,7 +195,10 @@ userRouter.post(
 
             res.cookie("access_token", token, { httpOnly: true, maxAge: 1000 * 60 * 60 * 24 * 30 });
 
-            if (req.body.socketId) await new Socket({ socketId: req.body.socketId, user: user._id }).save();
+            if (req.body.socketId) {
+                const found = await Socket.findOne({ socketId: req.body.socketId });
+                if (!found) await new Socket({ socketId: req.body.socketId, user: user._id }).save();
+            }
 
             return res.status(200).json(createdUser);
         } catch (error) {

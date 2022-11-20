@@ -6,7 +6,6 @@ import chatReducer from "./chat/reducer";
 import currencyReducer from "./currency/reducer";
 import ordersReducer from "./orders/reducer";
 import productsReducer from "./products/reducer";
-import sellersReducer from "./sellers/reducer";
 import stripeReducer from "./stripe/reducer";
 import uploadsReducer from "./upload/reducer";
 import advertismentReducer from "./advertisments/reducer";
@@ -22,7 +21,6 @@ export default combineReducers({
     cart: cartReducer,
     currencyState: currencyReducer,
     products: productsReducer,
-    sellers: sellersReducer,
     advertisments: advertismentReducer,
     chat: chatReducer,
     stripe: stripeReducer,

@@ -45,9 +45,7 @@ const ProductPage: FC<ProductPageProps> = ({ className = "", product, reverse, .
 
     useEffect(() => {
         setSelectedImage(product.image);
-    }, [product._id]);
-
-    if (!userInfo) return null;
+    }, [product]);
 
     return (
         <div
@@ -82,7 +80,7 @@ const ProductPage: FC<ProductPageProps> = ({ className = "", product, reverse, .
             )}
             <div className="flex flex-1 flex-col justify-between gap-8">
                 <div className="flex flex-col gap-8 flex-1">
-                    <TextHeader className="text-4xl sm:text-6xl text-accent lg:text-4xl xl:text-6xl line-clamp-1 hover:line-clamp-none">
+                    <TextHeader className="text-4xl break-all sm:text-6xl text-accent lg:text-4xl xl:text-6xl line-clamp-1 hover:line-clamp-none">
                         {product.name}
                     </TextHeader>
                     <div className="flex flex-col gap-4">
@@ -202,16 +200,22 @@ const ProductPage: FC<ProductPageProps> = ({ className = "", product, reverse, .
                         )}
                     </div>
                 </div>
-                {product.forSale && !product.sold && product.visible && product.seller._id !== userInfo._id && (
-                    <div className="flex flex-col gap-4">
-                        {adding.loading && <LoadingBox />}
-                        <ErrorWithRedirect {...adding} />
+                {product.forSale &&
+                    !product.sold &&
+                    product.visible &&
+                    userInfo &&
+                    product.seller._id !== userInfo._id && (
+                        <div className="flex flex-col gap-4">
+                            {adding.loading && <LoadingBox />}
+                            <ErrorWithRedirect {...adding} />
 
-                        <Button className="py-3 px-6 bg-accent" onClick={add}>
-                            <Paragraph className="text-2xl font-bold text-black tracking-wider">Add To Cart</Paragraph>
-                        </Button>
-                    </div>
-                )}
+                            <Button className="py-3 px-6 bg-accent" onClick={add}>
+                                <Paragraph className="text-2xl font-bold text-black tracking-wider">
+                                    Add To Cart
+                                </Paragraph>
+                            </Button>
+                        </div>
+                    )}
             </div>
         </div>
     );

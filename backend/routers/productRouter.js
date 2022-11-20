@@ -174,7 +174,7 @@ productRouter.get(
 );
 
 productRouter.get(
-    "/home",
+    "/list/home",
     expressAsyncHandler(async (req, res) => {
         try {
             const products = await Product.find()

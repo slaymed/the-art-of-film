@@ -34,8 +34,8 @@ const Register: FC<RegisterProps> = ({ className = "", ...rest }) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const [urlSearchParams, setSearchParams] = useSearchParams();
-    const redirect = urlSearchParams.get("redirect");
+    const [usp] = useSearchParams();
+    const redirect = usp.get("redirect") || "/";
 
     const { loading, errors } = useSelector(registerOperation);
     const userInfo = useSelector(user);
@@ -131,17 +131,6 @@ const Register: FC<RegisterProps> = ({ className = "", ...rest }) => {
                         onChange={handleChange}
                     />
                 </div>
-
-                {/* <div>
-          <label htmlFor="description">Description</label>
-          <textarea
-            id="description"
-            name={"description"}
-            type="text"
-            placeholder="Enter Description"
-            onChange={(e) => setDescription(e.target.value)}
-          ></textarea>
-        </div> */}
 
                 {(loading || fetching.loading) && <LoadingBox />}
 

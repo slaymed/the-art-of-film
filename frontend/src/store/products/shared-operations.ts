@@ -2,14 +2,14 @@ import {
     CREATE_POSTER,
     FETCH_MY_PRODUCTS,
     FETCH_MY_PRODUCTS_TARGETED_VALUE,
-    FETCH_PRODUCTS,
-    FETCH_PRODUCTS_TARGETED_VALUE,
+    FETCH_HOME_PRODUCTS,
+    FETCH_HOME_PRODUCTS_TARGETED_VALUE,
     UPDATE_POSTER,
 } from "./constants";
-import { createPoster, fetchMyProducts, fetchProducts, updatePoster } from "./thunks";
+import { createPoster, fetchMyProducts, fetchHomeProducts, updatePoster } from "./thunks";
 
 export const fetchingProductsSharedOperations = [
-    { thunk: fetchProducts, updateKey: FETCH_PRODUCTS, targetedValue: FETCH_PRODUCTS_TARGETED_VALUE },
+    { thunk: fetchHomeProducts, updateKey: FETCH_HOME_PRODUCTS, targetedValue: FETCH_HOME_PRODUCTS_TARGETED_VALUE },
     { thunk: fetchMyProducts, updateKey: FETCH_MY_PRODUCTS, targetedValue: FETCH_MY_PRODUCTS_TARGETED_VALUE },
 ];
 

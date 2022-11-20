@@ -1,4 +1,4 @@
-import React, { FC, ComponentProps, useMemo, useCallback, memo } from "react";
+import React, { FC, ComponentProps, useMemo, useCallback, memo, useEffect } from "react";
 import classNames from "classnames";
 import { useSelector } from "react-redux";
 
@@ -14,18 +14,20 @@ import { ChatList } from "../../../store/chat/types";
 import Paragraph from "../../elements/Paragraph";
 import ChatReadBadge from "../../kits/chat/ChatReadBadge";
 import ChatWatchedBadge from "../../kits/chat/ChatWatchedBadge";
+import { useSearchParams } from "react-router-dom";
 
 export interface ChatListSectionProps extends ComponentProps<"div"> {}
 
 const ChatListSection: FC<ChatListSectionProps> = ({ className = "", ...rest }) => {
     const dispatch = useDispatch();
 
+    const [usp, setUsp] = useSearchParams();
+    const pannel = (usp.get("pannel") || SelectedChatList.SELLERS) as SelectedChatList;
+
     const buyersList = useSelector(buyersMapList);
     const sellersList = useSelector(sellersMapList);
     const selectedList = useSelector(selectedChatList);
     const userInfo = useSelector(user);
-
-    const updateSelectedList = useCallback((key: SelectedChatList) => dispatch(selectChatList(key)), [dispatch]);
 
     const list = useMemo(() => {
         if (selectedList === SelectedChatList.SELLERS) return sellersList;
@@ -40,6 +42,10 @@ const ChatListSection: FC<ChatListSectionProps> = ({ className = "", ...rest }) 
         if (!chatList.watched) dispatch(readChat({ chatId: chatList._id, user: userInfo }));
     };
 
+    useEffect(() => {
+        dispatch(selectChatList(pannel));
+    }, [pannel]);
+
     return (
         <div
             {...rest}
@@ -52,7 +58,7 @@ const ChatListSection: FC<ChatListSectionProps> = ({ className = "", ...rest }) 
                     className={classNames("w-1/2 p-4 text-center cursor-pointer", {
                         "bg-accent/80 text-black": selectedList === SelectedChatList.BUYERS,
                     })}
-                    onClick={() => updateSelectedList(SelectedChatList.BUYERS)}
+                    onClick={() => setUsp({ pannel: SelectedChatList.BUYERS })}
                 >
                     <Paragraph className="text-sm font-bold tracking-wider">Clients</Paragraph>
                 </div>
@@ -60,7 +66,7 @@ const ChatListSection: FC<ChatListSectionProps> = ({ className = "", ...rest }) 
                     className={classNames("w-1/2 p-4 text-center cursor-pointer", {
                         "bg-accent/80 text-black": selectedList === SelectedChatList.SELLERS,
                     })}
-                    onClick={() => updateSelectedList(SelectedChatList.SELLERS)}
+                    onClick={() => setUsp({ pannel: SelectedChatList.SELLERS })}
                 >
                     <Paragraph className="text-sm font-bold tracking-wider">Sellers</Paragraph>
                 </div>

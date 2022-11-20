@@ -9,16 +9,19 @@ import { ChatList, IMessage } from "./types";
 export const buyersMapList = createSelector(
     (state: RootState) => {
         const user = state.auth.user as User;
+        if (!user) return [];
 
-        return state.chat.list.map((chat) => ({
-            _id: chat._id,
-            name: chat.buyer.name,
-            lastMessage: chat.messages[0] || {},
-            seen: chat.readBy.includes(chat.buyer._id),
-            watched: chat.readBy.includes(user._id),
-            selected: state.chat.selectedChatId === chat._id,
-            updatedAt: chat.updatedAt,
-        }));
+        return state.chat.list
+            .filter((chat) => chat.seller._id === user._id)
+            .map((chat) => ({
+                _id: chat._id,
+                name: chat.buyer.name,
+                lastMessage: chat.messages[0] || {},
+                seen: chat.readBy.includes(chat.buyer._id),
+                watched: chat.readBy.includes(user._id),
+                selected: state.chat.selectedChatId === chat._id,
+                updatedAt: chat.updatedAt,
+            }));
     },
     (mapList: ChatList[]) => mapList
 );
@@ -26,16 +29,19 @@ export const buyersMapList = createSelector(
 export const sellersMapList = createSelector(
     (state: RootState) => {
         const user = state.auth.user as User;
+        if (!user) return [];
 
-        return state.chat.list.map((chat) => ({
-            _id: chat._id,
-            name: chat.seller.name,
-            lastMessage: chat.messages[0] || {},
-            seen: chat.readBy.includes(chat.seller._id),
-            watched: chat.readBy.includes(user._id),
-            selected: state.chat.selectedChatId === chat._id,
-            updatedAt: chat.updatedAt,
-        }));
+        return state.chat.list
+            .filter((chat) => chat.buyer._id === user._id)
+            .map((chat) => ({
+                _id: chat._id,
+                name: chat.seller.name,
+                lastMessage: chat.messages[0] || {},
+                seen: chat.readBy.includes(chat.seller._id),
+                watched: chat.readBy.includes(user._id),
+                selected: state.chat.selectedChatId === chat._id,
+                updatedAt: chat.updatedAt,
+            }));
     },
     (map: ChatList[]) => map
 );

@@ -1,7 +1,21 @@
-import { RolledFoldedShippingCost, ShippingCost } from "../sellers/types";
 import { GlobalMessage, GlobalOperation } from "../types";
 
 export type Address = { address: string; city?: string; postalCode?: string; country?: string; code?: string };
+
+export type ShippingCost = {
+    [key: string]: number;
+    default: number;
+};
+
+export type RolledFolded = {
+    rolled: number;
+    folded: number;
+};
+
+export type RolledFoldedShippingCost = {
+    [key: string]: RolledFolded;
+    default: RolledFolded;
+};
 
 export interface User extends Address {
     _id: string;
@@ -32,14 +46,9 @@ export interface RegisterVars extends SignInVars {
     sellerName: string;
 }
 
-export interface UpdateUserVars extends Address {
-    name: string;
-    email: string;
-    logo: string;
-    description: string;
-    password: string;
-    confirm_pasword: string;
-    sellerName: string;
+export interface UpdateUserVars extends Partial<User> {
+    password?: string;
+    confirm_pasword?: string;
 }
 
 export interface SigninErrors extends Partial<SignInVars>, GlobalMessage {}

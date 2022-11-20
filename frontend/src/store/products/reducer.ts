@@ -5,7 +5,7 @@ import { globalMessage } from "../initial-state";
 import { GlobalMessage, ThunkResponseType } from "../types";
 import { ProductsInitialState } from "./initial-state";
 import { create_edit_product_shared_operation, fetchingProductsSharedOperations } from "./shared-operations";
-import { createPoster, deletePoster, fetchProduct, fetchProducts } from "./thunks";
+import { deletePoster, fetchProduct } from "./thunks";
 import { IProduct } from "./types";
 
 const slice = createSlice({

@@ -46,6 +46,6 @@
 @media (min-width: 640px) {
     .slick-center.slick-current {
         z-index: 720;
-        transform: perspective(720px) translateZ(100px) rotateY(0deg) scale(1.4) !important;
+        transform: perspective(720px) translateZ(100px) rotateY(0deg) !important;
     }
 }

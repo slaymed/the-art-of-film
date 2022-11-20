@@ -2,14 +2,15 @@ import React, { FC, ComponentProps, useEffect } from "react";
 import classNames from "classnames";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+
 import { fetchingSellerShowcase, selectedShowcase } from "../store/showcase/selectors";
-import { user } from "../store/auth/selectors";
-import Paragraph from "../components/elements/Paragraph";
+import { fetchSellerShowcase } from "../store/showcase/thunks";
+
 import LoadingBox from "../components/kits/LoadingBox";
 import ErrorWithRedirect from "../components/kits/ErrorWithRedirect";
 import SellerShowcasePage from "../components/pages/showcase/SellerShowcasePage";
+
 import { useDispatch } from "../hooks/useDispatch";
-import { fetchSellerShowcase } from "../store/showcase/thunks";
 
 export interface SellerShowcaseScreenProps extends ComponentProps<"div"> {}
 
@@ -19,11 +20,10 @@ const SellerShowcaseScreen: FC<SellerShowcaseScreenProps> = ({ className = "", .
 
     const showcase = useSelector(selectedShowcase);
     const fetching = useSelector(fetchingSellerShowcase);
-    const userInfo = useSelector(user);
 
     useEffect(() => {
         if (sellerId) dispatch(fetchSellerShowcase(sellerId));
-    }, [sellerId]);
+    }, [sellerId, dispatch]);
 
     return (
         <div
@@ -34,7 +34,7 @@ const SellerShowcaseScreen: FC<SellerShowcaseScreenProps> = ({ className = "", .
         >
             {fetching.loading && <LoadingBox className="pb-8 sm:pb-16" />}
             <ErrorWithRedirect {...fetching} className="pb-8 sm:pb-16" />
-            {!fetching.loading && showcase && userInfo && <SellerShowcasePage user={userInfo} showcase={showcase} />}
+            {!fetching.loading && showcase && !fetching.errors.message && <SellerShowcasePage showcase={showcase} />}
         </div>
     );
 };

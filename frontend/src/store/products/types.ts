@@ -51,10 +51,10 @@ export type CreateEditPosterVars = {
 };
 
 export interface IProductsState {
-    fetching: GlobalOperation;
+    fetchingHomeProducts: GlobalOperation;
     selectedProduct: IProduct | null;
     fetchingSelectedProduct: GlobalOperation;
-    list: IProduct[];
+    homelist: IProduct[];
     myProducts: IProduct[];
     create: GlobalOperation;
     update: GlobalOperation;

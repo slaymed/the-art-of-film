@@ -2,18 +2,18 @@ import React, { FC, ComponentProps, useState, useMemo } from "react";
 import classNames from "classnames";
 
 import { IShowcase } from "../../../store/showcase/types";
-import { User } from "../../../store/auth/types";
+import { selectShowcaseProduct } from "../../../store/showcase/actions";
+
 import FilterCard from "../../cards/FilterCard";
 import ShowcaseCarousel from "./ShowcaseCarousel";
+
 import { useDispatch } from "../../../hooks/useDispatch";
-import { selectShowcaseProduct } from "../../../store/showcase/actions";
 
 export interface ShowcaseProductsProps extends ComponentProps<"div"> {
     showcase: IShowcase;
-    user: User;
 }
 
-const ShowcaseProducts: FC<ShowcaseProductsProps> = ({ className = "", showcase, user, ...rest }) => {
+const ShowcaseProducts: FC<ShowcaseProductsProps> = ({ className = "", showcase, ...rest }) => {
     const dispatch = useDispatch();
 
     const [filter, setFilter] = useState("All");

@@ -32,8 +32,8 @@ const SigninScreen: FC<SigninScreenProps> = ({ className = "", style = {}, ...re
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const [urlSearchParams, setSearchParams] = useSearchParams();
-    const redirect = urlSearchParams.get("redirect");
+    const [usp] = useSearchParams();
+    const redirect = usp.get("redirect") || "/";
 
     const [vars, setVars] = useState(initialState);
 

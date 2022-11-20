@@ -6,14 +6,12 @@ import { useSelector } from "react-redux";
 
 import { useDispatch } from "../hooks/useDispatch";
 
-import data from "../data";
-
-import { fetchingProducts, productsSelector } from "../store/products/selectors";
+import { fetchingHomeProducts, homeProductsSelector } from "../store/products/selectors";
 import { advertismentsSelector } from "../store/advertisments/selectors";
 import { fetchAdvertisment } from "../store/advertisments/thunk";
-import { topSellersSelector } from "../store/sellers/selectors";
-import { fetchProducts } from "../store/products/thunks";
-import { fetchTopSellers } from "../store/sellers/thunks";
+import { fetchHomeProducts } from "../store/products/thunks";
+import { fetchTopSellersShowcaseList } from "../store/showcase/thunks";
+import { topSellersShowcaseList } from "../store/showcase/selectors";
 
 import HowItWorksSection from "../components/sections/HowItWorksSection";
 import ShowcaseSection from "../components/sections/ShowcaseSection";
@@ -25,6 +23,7 @@ import LoadingBox from "../components/kits/LoadingBox";
 import SearchBox from "../components/SearchBox";
 import H1 from "../components/elements/H1";
 import TextHeader from "../components/elements/TextHeader";
+import SellerShowcaseCard from "../components/cards/SellerShowcaseCard";
 
 // TODO: Redesigned using tailwind: Remove Comment When Pushing to production
 
@@ -35,14 +34,14 @@ export interface HomeScreenProps extends ComponentProps<"div"> {}
 const HomeScreen: FC<HomeScreenProps> = ({ className = "", ...rest }) => {
     const dispatch = useDispatch();
 
-    const products = useSelector(productsSelector).slice(0, 6);
-    const sellers = useSelector(topSellersSelector);
+    const products = useSelector(homeProductsSelector).slice(0, 6);
+    const showcases = useSelector(topSellersShowcaseList);
     const advertisements = useSelector(advertismentsSelector);
-    const { loading, errors } = useSelector(fetchingProducts);
+    const { loading, errors } = useSelector(fetchingHomeProducts);
 
     useEffect(() => {
-        dispatch(fetchProducts());
-        dispatch(fetchTopSellers());
+        dispatch(fetchHomeProducts());
+        dispatch(fetchTopSellersShowcaseList());
         dispatch(fetchAdvertisment());
     }, [dispatch]);
 
@@ -152,68 +151,13 @@ const HomeScreen: FC<HomeScreenProps> = ({ className = "", ...rest }) => {
                             { width: 1280, itemsToShow: 4 },
                         ]}
                     >
-                        {Array.isArray(sellers) &&
-                            sellers?.map((seller) => {
+                        {Array.isArray(showcases) &&
+                            showcases?.map(({ seller }) => {
                                 if (!seller) return null;
-                                return (
-                                    <div className="bg-base p-4 w-full max-w-[300px]" key={seller._id}>
-                                        <ul className="bg-light-dark flex space-y-8 flex-col p-8 w-full items-center">
-                                            <li>
-                                                <Link
-                                                    className="text-2xl tracking-widest text-center text-accent"
-                                                    to={`/seller/${seller._id}`}
-                                                >
-                                                    {seller.name}
-                                                </Link>
-                                            </li>
-
-                                            <li className="w-full">
-                                                <div className="flex justify-between items-center">
-                                                    <div className="flex space-x-0.4">
-                                                        <span style={{ fontSize: "2.5rem" }}>
-                                                            <img
-                                                                width="32px"
-                                                                src={
-                                                                    (seller.country && data.flags[seller.country]) ??
-                                                                    "https://upload.wikimedia.org/wikipedia/commons/b/b0/No_flag.svg"
-                                                                }
-                                                                alt={seller.name}
-                                                            />
-                                                        </span>
-                                                        <span className="ml-2">
-                                                            {
-                                                                data.stripe_origins.find(
-                                                                    (stripe_origin) =>
-                                                                        stripe_origin.code === seller.country
-                                                                )?.name
-                                                            }
-                                                        </span>
-                                                    </div>
-                                                    <Link className="text-lg text-accent" to={`/seller/${seller._id}`}>
-                                                        <i className="fas fa-arrow-right" />
-                                                    </Link>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                );
+                                return <SellerShowcaseCard seller={seller} />;
                             })}
                     </CarouselComponent>
                 </div>
-                {/* <CoverFlowComponent
-            imagesArr={sellers?.map(({ seller }) => seller.logo)}
-            direction="horizontal"
-            width={`${isMobile ? "100%" : "100%"}`}
-            height={`${isMobile ? "100%" : 425}`}
-            itemRatio="21:14"
-            background="transparent"
-            onClick={(seller) => {}}
-            handleSelect={(index) => {
-              const _seller = sellers?.find((seller, ind) => ind === index);
-              navigate(`/seller/${_seller?._id}`);
-            }}
-            labelsArr={sellers?.map(({ seller }) => seller.name)}
-          /> */}
             </div>
         </div>
     );

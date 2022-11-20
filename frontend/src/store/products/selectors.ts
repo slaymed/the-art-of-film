@@ -3,9 +3,9 @@ import { createSelector } from "@reduxjs/toolkit";
 import { GlobalOperation, RootState } from "../types";
 import { IProduct } from "./types";
 
-export const productsSelector = createSelector(
-    (state: RootState) => state.products.list,
-    (products: IProduct[]) => products
+export const homeProductsSelector = createSelector(
+    (state: RootState) => state.products.homelist,
+    (homelist: IProduct[]) => homelist
 );
 
 export const selectMyProduct = (productId?: string) =>
@@ -14,9 +14,9 @@ export const selectMyProduct = (productId?: string) =>
         (product?: IProduct) => product
     );
 
-export const fetchingProducts = createSelector(
-    (state: RootState) => state.products.fetching,
-    (fetching: GlobalOperation) => fetching
+export const fetchingHomeProducts = createSelector(
+    (state: RootState) => state.products.fetchingHomeProducts,
+    (fetchingHomeProducts: GlobalOperation) => fetchingHomeProducts
 );
 
 export const fetchingMyProducts = createSelector(

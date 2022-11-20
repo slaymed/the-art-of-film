@@ -21,7 +21,7 @@ const SearchBox: FC<SearchBoxProps> = ({ className = "", ...rest }) => {
         <form
             {...rest}
             className={classNames("flex flex-shrink-0 w-full justify-center text-black", { [className]: className })}
-            onSubmit={(e) => submitHandler}
+            onSubmit={submitHandler}
         >
             <AppInput
                 type="text"

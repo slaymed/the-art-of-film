@@ -59,6 +59,8 @@ import EditPosterScreen from "./screens/EditPosterScreen";
 import PostersListScreen from "./screens/PostersListScreen";
 import PosterScreen from "./screens/PosterScreen";
 import SellerShowcaseScreen from "./screens/SellerShowcaseScreen";
+import SellersShowcasesListScreen from "./screens/SellersShowcasesListScreen";
+import ShippingDetailScreen from "./screens/ShippingDetailScreen";
 
 dayjs.extend(relativeTime);
 
@@ -250,6 +252,15 @@ function App() {
                         />
 
                         <Route
+                            path="/shipment-settings"
+                            element={
+                                <AuthRoute>
+                                    <ShippingDetailScreen />
+                                </AuthRoute>
+                            }
+                        />
+
+                        <Route
                             path="/posters/seller"
                             element={
                                 <AuthRoute>
@@ -258,24 +269,10 @@ function App() {
                             }
                         />
 
-                        <Route
-                            path="/poster/:posterId"
-                            element={
-                                <AuthRoute>
-                                    <PosterScreen />
-                                </AuthRoute>
-                            }
-                        />
+                        <Route path="/poster/:posterId" element={<PosterScreen />} />
 
-                        <Route
-                            path="/seller/:sellerId"
-                            element={
-                                <AuthRoute>
-                                    <SellerShowcaseScreen />
-                                </AuthRoute>
-                            }
-                        />
-
+                        <Route path="/seller/:sellerId" element={<SellerShowcaseScreen />} />
+                        <Route path="/sellers" element={<SellersShowcasesListScreen />} />
                         <Route path="/page/subscriptions" element={<PricingScreen />} />
 
                         <Route path="/payment/success" element={<PaymentSuccess />} />

@@ -16,20 +16,31 @@ export const generateToken = (id) => {
     );
 };
 
-export const isAuth = (req, res, next) => {
-    const access_token = req.cookies.access_token;
-    if (!access_token) return res.status(401).json({ message: "Invalid/Expired Token" });
+export const getUser = async (access_token) => {
+    let user;
 
-    jwt.verify(access_token, process.env.JWT_SECRET || "somethingsecret", async (err, { _id }) => {
-        if (err) return res.status(401).json({ message: "Invalid/Expired Token" });
-
-        const user = await User.findById(_id);
-        if (!user) return res.status(401).json({ message: "Invalid/Expired Token" });
-
-        req.user = user;
-
-        next();
+    await new Promise((resolve) => {
+        jwt.verify(access_token, process.env.JWT_SECRET || "somethingsecret", async (err, { _id }) => {
+            if (!err) user = await User.findById(_id);
+            resolve();
+        });
     });
+
+    return user;
+};
+
+export const isAuth = async (req, res, next) => {
+    const resMsg = { message: "Invalid/Expired Token" };
+
+    if (!req.cookies.access_token) return res.status(401).json(resMsg);
+
+    const user = await getUser(req.cookies.access_token);
+
+    if (!user) return res.status(401).json(resMsg);
+
+    req.user = user;
+
+    next();
 };
 
 export const getSubscription = async (user) => {
