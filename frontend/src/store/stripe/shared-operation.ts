@@ -1,5 +1,5 @@
 import { CANCEL_SESSION, CREATE_SESSION } from "./constants";
-import { createAdvertiseSession, cancelSession, createOrderSession } from "./thunks";
+import { createAdvertiseSession, cancelSession, createOrderSession, createGiftSubSession } from "./thunks";
 
 export const stripeSharedOperation = [
     {
@@ -8,6 +8,10 @@ export const stripeSharedOperation = [
     },
     {
         thunk: createOrderSession,
+        updateKey: CREATE_SESSION,
+    },
+    {
+        thunk: createGiftSubSession,
         updateKey: CREATE_SESSION,
     },
     {

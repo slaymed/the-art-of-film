@@ -7,7 +7,7 @@ const sessionSchema = new mongoose.Schema(
         type: {
             type: String,
             required: true,
-            enum: ["subscription", "poster", "advertisement"],
+            enum: ["gift", "poster", "advertisement"],
         },
         ref: { type: mongoose.Schema.Types.ObjectId },
         period: { type: String, enum: ["month", "year"] },

@@ -5,7 +5,7 @@ import { SubscriptionInitialState } from "./initial-state";
 import { ISubscription } from "./types";
 import { GlobalMessage, ThunkResponseType } from "../types";
 import { subscriptionSharedOperations } from "./shared-operations";
-import { fetchAvailableSubscriptions } from "./thunks";
+import { fetchAvailableSubscriptions, redeemGiftSub } from "./thunks";
 
 const slice = createSlice({
     name: "subscriptions",
@@ -46,6 +46,24 @@ const slice = createSlice({
 
             if (errors) subscriptions.fetchingAvailable.errors = errors;
             subscriptions.fetchingAvailable.loading = false;
+        });
+
+        addCase(redeemGiftSub.pending, (subscriptions) => {
+            subscriptions.redeem.loading = true;
+        });
+        addCase(redeemGiftSub.fulfilled, (subscriptions, { payload }) => {
+            const { data: currentSub } = payload;
+
+            subscriptions.current = currentSub;
+            subscriptions.redeem.errors = globalMessage;
+            subscriptions.fetchingCurrentSub.errors = globalMessage;
+            subscriptions.redeem.loading = false;
+        });
+        addCase(redeemGiftSub.rejected, (subscriptions, { payload }) => {
+            const { errors } = payload as ThunkResponseType<ISubscription[], GlobalMessage>;
+
+            if (errors) subscriptions.redeem.errors = errors;
+            subscriptions.redeem.loading = false;
         });
     },
 });

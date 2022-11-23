@@ -1,6 +1,9 @@
 import jwt from "jsonwebtoken";
 import mg from "mailgun-js";
 import getStripe from "./helpers/get-stripe.js";
+import { isObject } from "./helpers/isObject.js";
+import Gift from "./models/giftModal.js";
+import SubscriptionGift from "./models/SubscriptionGift.js";
 import User from "./models/userModel.js";
 import UserStripeInfo from "./models/userStripeInfoModal.js";
 
@@ -30,20 +33,46 @@ export const getUser = async (access_token) => {
 };
 
 export const isAuth = async (req, res, next) => {
-    const resMsg = { message: "Invalid/Expired Token" };
+    try {
+        const resMsg = { message: "Invalid/Expired Token" };
 
-    if (!req.cookies.access_token) return res.status(401).json(resMsg);
+        if (!req.cookies.access_token) return res.status(401).json(resMsg);
 
-    const user = await getUser(req.cookies.access_token);
+        const user = await getUser(req.cookies.access_token);
 
-    if (!user) return res.status(401).json(resMsg);
+        if (!user) return res.status(401).json(resMsg);
 
-    req.user = user;
+        req.user = user;
 
-    next();
+        next();
+    } catch (error) {
+        return res.status(500).json(error);
+    }
 };
 
-export const getSubscription = async (user) => {
+export const getGiftSub = async (user) => {
+    const giftSub = await SubscriptionGift.findOne({ user: user._id, active: true }).populate("gift");
+    if (!giftSub) return null;
+
+    return giftSub;
+};
+
+export const giftSubValid = async (giftSub) => {
+    if (!giftSub) return false;
+
+    const now_time = new Date().getTime();
+
+    if (now_time < giftSub.cancel_at) return true;
+
+    if (giftSub.active) {
+        giftSub.active = false;
+        await giftSub.save();
+    }
+
+    return false;
+};
+
+export const getStripeSubscription = async (user) => {
     const useStripeInfo = await UserStripeInfo.findOne({ user: user._id });
     if (!useStripeInfo) return res.status(401).json(errorRes);
 
@@ -60,7 +89,7 @@ export const getSubscription = async (user) => {
     return sub;
 };
 
-export const subValid = (sub) => {
+export const stripeSubValid = (sub) => {
     if (!sub) return false;
 
     if (sub.status === "active" || sub.status === "trialing") return true;
@@ -68,42 +97,41 @@ export const subValid = (sub) => {
     return false;
 };
 
+export const is_subscribed = async (user) => {
+    const giftSub = await getGiftSub(user);
+    if (await giftSubValid(giftSub)) return true;
+
+    const stripeSub = await getStripeSubscription(user);
+    if (stripeSubValid(stripeSub)) return true;
+
+    return false;
+};
+
 export const isSubscribed = async (req, _, next) => {
-    const errorRes = {
-        message: "You're Not Subscribed, Please Subscribe to access this feature.",
-        redirect: "/page/subscriptions",
-    };
+    try {
+        const errorRes = {
+            message: "You're Not Subscribed, Please Subscribe to access this feature.",
+            redirect: "/page/subscriptions",
+        };
 
-    const sub = await getSubscription(req.user);
-    const valid = subValid(sub);
-    if (!valid) return res.status(401).json(errorRes);
+        const giftSub = await getGiftSub(req.user);
+        const validGiftSub = await giftSubValid(giftSub);
+        if (validGiftSub) {
+            req.giftSub = giftSub;
+            next();
+        }
 
-    req.sub = sub;
+        if (!giftSub) {
+            const sub = await getStripeSubscription(req.user);
+            const valid = stripeSubValid(sub);
+            if (!valid) return res.status(401).json(errorRes);
 
-    next();
-};
+            req.sub = sub;
 
-export const isAdmin = (req, res, next) => {
-    if (req.user && req.user.isAdmin) {
-        next();
-    } else {
-        res.status(401).send({ message: "Invalid Admin Token" });
-    }
-};
-
-export const isSeller = (req, res, next) => {
-    if (req.user && req.user.isSeller) {
-        next();
-    } else {
-        res.status(401).send({ message: "Invalid Seller Token" });
-    }
-};
-
-export const isSellerOrAdmin = (req, res, next) => {
-    if (req.user && (req.user.isSeller || req.user.isAdmin)) {
-        next();
-    } else {
-        res.status(401).send({ message: "Invalid Admin/Seller Token" });
+            next();
+        }
+    } catch (error) {
+        return res.status(500).json(error);
     }
 };
 

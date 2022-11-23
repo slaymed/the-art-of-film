@@ -14,6 +14,7 @@ import { useDispatch } from "../hooks/useDispatch";
 import { updateProfile } from "../store/auth/thunks";
 import LoadingBox from "../components/kits/LoadingBox";
 import ErrorWithRedirect from "../components/kits/ErrorWithRedirect";
+import { countrySelectDefaultOption, countrySelectOptions } from "../data";
 
 export interface ShippingDetailScreenProps extends ComponentProps<"div"> {}
 
@@ -23,14 +24,25 @@ const ShippingDetailScreen: FC<ShippingDetailScreenProps> = ({ className = "", .
     const dispatch = useDispatch();
 
     const updating = useSelector(updatingProfile);
-
     const userInfo = useSelector(user) as User;
+    const [newVars, setNewVars] = useState(initialState);
     const [costs, setCosts] = useState(userInfo.rolled_folded_shipping_cost);
     const [vars, setVars] = useState<typeof initialState>(initialState);
 
+    const handleNewVarsChange = (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => {
+        setNewVars((prev) => ({ ...prev, [event.target.name]: event.target.value }));
+    };
+
+    const submitNewVarsChange = () => {
+        if (!newVars.key) return;
+        const rolled = newVars.rolled || 0;
+        const folded = newVars.folded || 0;
+        setCosts((prev) => ({ ...prev, [newVars.key]: { rolled, folded } }));
+        setNewVars(initialState);
+    };
+
     const handleVarsChange = (event: ChangeEvent<HTMLInputElement>) => {
-        if (event.target.value.length > 2) return;
-        const value = event.target.value ? parseInt(event.target.value) : "";
+        const value = event.target.value ? parseFloat(event.target.value) : "";
         setVars((prev) => ({ ...prev, [event.target.name]: value }));
     };
 
@@ -49,10 +61,16 @@ const ShippingDetailScreen: FC<ShippingDetailScreenProps> = ({ className = "", .
         dispatch(updateProfile({ rolled_folded_shipping_cost: costs }));
     };
 
+    const remove = (key: string) => {
+        const clone = { ...costs };
+        delete clone[key];
+        setCosts(clone);
+    };
+
     return (
         <PageLayout>
             <div {...rest} className={classNames("bg-light-dark py-24 w-full px-8", { [className]: className })}>
-                <form onSubmit={handleSubmit} className="flex flex-col max-w-3xl mx-auto gap-8 form w-full">
+                <form onSubmit={handleSubmit} className="flex flex-col max-w-4xl mx-auto gap-8 form w-full">
                     <Paragraph className="text-4xl sm:text-6xl font-bold line-clamp-2 hover:line-clamp-none tracking-widest text-accent uppercase">
                         Shipping Detail
                     </Paragraph>
@@ -72,13 +90,59 @@ const ShippingDetailScreen: FC<ShippingDetailScreenProps> = ({ className = "", .
                         </Paragraph>
                     </div>
 
+                    <div className="flex gap-4 flex-col">
+                        <select
+                            name="key"
+                            id="country"
+                            className="bg-slate-700 rounded text-sm px-2 py-1.5 text-white/80"
+                            placeholder="Select Country"
+                            defaultValue={countrySelectDefaultOption.label}
+                            required
+                            onChange={handleNewVarsChange}
+                        >
+                            {countrySelectOptions.map(({ label, value }) => (
+                                <option key={value} value={label}>
+                                    {label}
+                                </option>
+                            ))}
+                        </select>
+                        <CurrencyInput
+                            name="rolled"
+                            type="text"
+                            row
+                            placeholder="Rolled (GBP)"
+                            className="bg-slate-700 rounded py-1.5 px-2 !text-white"
+                            required
+                            value={vars.rolled}
+                            onChange={handleVarsChange}
+                        />
+                        <CurrencyInput
+                            name="folded"
+                            type="text"
+                            row
+                            placeholder="Folded (GBP)"
+                            className="bg-slate-700 rounded py-1.5 px-2 !text-white"
+                            required
+                            value={vars.folded}
+                            onChange={handleVarsChange}
+                        />
+                        {newVars.key && (
+                            <Button
+                                className="text-accent w-full rounded py-1.5 px-2 bg-accent/20"
+                                onClick={submitNewVarsChange}
+                            >
+                                <Paragraph>Add</Paragraph>
+                            </Button>
+                        )}
+                    </div>
+
                     <div className="w-full max-h-[600px] overflow-auto scroll-bar border border-dark-card">
                         <table className="w-full">
                             <colgroup>
-                                <col width="25%" />
-                                <col width="25%" />
-                                <col width="25%" />
-                                <col width="25%" />
+                                <col />
+                                <col />
+                                <col />
+                                <col />
                             </colgroup>
                             <thead>
                                 <tr className="bg-dark-card">
@@ -181,7 +245,11 @@ const ShippingDetailScreen: FC<ShippingDetailScreenProps> = ({ className = "", .
                                                         >
                                                             <i className="fa-solid fa-edit" />
                                                         </Button>
-                                                        <Button type="button" className="p-4 text-red-500">
+                                                        <Button
+                                                            type="button"
+                                                            className="p-4 text-red-500"
+                                                            onClick={() => remove(key)}
+                                                        >
                                                             <i className="fa-solid fa-trash" />
                                                         </Button>
                                                     </div>

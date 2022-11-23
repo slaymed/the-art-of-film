@@ -14,9 +14,9 @@ issueRouter.get(
     "/order-issues/:orderId",
     isAuth,
     expressAsyncHandler(async (req, res) => {
-        const { orderId } = req.params;
-
         try {
+            const { orderId } = req.params;
+
             const order = await Order.findById(orderId);
             if (!order) return res.status(401).json({ message: "Unauthorized" });
 
@@ -36,13 +36,13 @@ issueRouter.post(
     "/raise-an-issue",
     isAuth,
     expressAsyncHandler(async (req, res) => {
-        const { orderId, becauseOf } = req.body;
-        const io = req.app.locals.settings.io;
-
-        if (typeof becauseOf !== "string" || !becauseOf.trim())
-            return res.status(401).json({ message: "Issue Reason must be provided" });
-
         try {
+            const { orderId, becauseOf } = req.body;
+            const io = req.app.locals.settings.io;
+
+            if (typeof becauseOf !== "string" || !becauseOf.trim())
+                return res.status(401).json({ message: "Issue Reason must be provided" });
+
             const order = await Order.findById(orderId).populate("user").populate("seller");
             if (!order) return res.status(404).json({ message: "Order Not Found" });
 

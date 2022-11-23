@@ -10,7 +10,6 @@ import Chat from "../models/chatModel.js";
 import Message from "../models/messageModal.js";
 import Socket from "../models/socketModal.js";
 import getStripe from "../helpers/get-stripe.js";
-import Issue from "../models/IssueModal.js";
 
 const orderRouter = express.Router();
 
@@ -145,10 +144,10 @@ orderRouter.post(
     "/mark-as-delivered",
     isAuth,
     expressAsyncHandler(async (req, res) => {
-        const user = req.user;
-        const io = req.app.locals.settings.io;
-
         try {
+            const user = req.user;
+            const io = req.app.locals.settings.io;
+
             const order = await Order.findById(req.body.orderId).populate("seller").populate("user");
             if (!order) return res.status(404).json({ message: "Order not found" });
             if (order.seller._id.toString() !== user._id.toString())
@@ -206,10 +205,10 @@ orderRouter.post(
     "/mark-as-recieved",
     isAuth,
     expressAsyncHandler(async (req, res) => {
-        const user = req.user;
-        const io = req.app.locals.settings.io;
-
         try {
+            const user = req.user;
+            const io = req.app.locals.settings.io;
+
             const order = await Order.findById(req.body.orderId).populate("seller").populate("user");
             if (!order) return res.status(404).json({ message: "Order not found" });
             if (order.user._id.toString() !== user._id.toString())
@@ -278,9 +277,9 @@ orderRouter.post(
     "/create-order-checkout-session",
     isAuth,
     expressAsyncHandler(async (req, res) => {
-        const { socketId, orderId } = req.body;
-
         try {
+            const { socketId, orderId } = req.body;
+
             const order = await Order.findById(orderId);
             if (!order) return res.status(404).json({ message: "Order not found" });
             if (order.orderItems.length === 0) return res.status(401).json({ message: "Order Empty" });
@@ -333,6 +332,8 @@ orderRouter.post(
                 success_url: `${process.env.STRIPE_SUCCESS_URL ?? "http://localhost:3000/payment/success"}`,
                 cancel_url: `${process.env.STRIPE_SUCCESS_URL ?? "http://localhost:3000/payment/canceled"}`,
             });
+
+            await Session.deleteMany({ ref: orderId, status: "unpaid" });
 
             const new_session = new Session({
                 id: session.id,

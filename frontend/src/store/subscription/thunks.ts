@@ -8,10 +8,12 @@ import {
     FETCH_AVAILABLE_SUBSCRIPTIONS_URL,
     FETCH_CURRENT_SUBSCRIPTION_PREFIX,
     FETCH_CURRENT_SUBSCRIPTION_URL,
+    REDEEM_GIFT_SUB_PREFIX,
+    REDEEM_GIFT_SUB_URL,
     SUBSCRIBE_PREFIX,
     SUBSCRIBE_URL,
 } from "./constants";
-import { CurrentSub, ISubscription, SubscribeParams } from "./types";
+import { CurrentSub, GiftSub, ISubscription, SubscribeParams } from "./types";
 
 export const fetchAvailableSubscriptions = createAsyncThunk(
     FETCH_AVAILABLE_SUBSCRIPTIONS_PREFIX,
@@ -40,6 +42,15 @@ export const fetchCurrentSubscription = createAsyncThunk(
 export const subscribe = createAsyncThunk(SUBSCRIBE_PREFIX, async (vars: SubscribeParams, { rejectWithValue }) => {
     try {
         const res = await axios.post(SUBSCRIBE_URL, vars);
+        return { status: RequestLifeCycle.SUCCESS, data: res.data as CurrentSub };
+    } catch (errors) {
+        return rejectWithValue({ status: RequestLifeCycle.FAILED, errors: mapErrors(errors) });
+    }
+});
+
+export const redeemGiftSub = createAsyncThunk(REDEEM_GIFT_SUB_PREFIX, async (code: string, { rejectWithValue }) => {
+    try {
+        const res = await axios.post(REDEEM_GIFT_SUB_URL, { code });
         return { status: RequestLifeCycle.SUCCESS, data: res.data as CurrentSub };
     } catch (errors) {
         return rejectWithValue({ status: RequestLifeCycle.FAILED, errors: mapErrors(errors) });

@@ -2,12 +2,13 @@ import express from "express";
 import expressAsyncHandler from "express-async-handler";
 
 import getStripe from "../helpers/get-stripe.js";
+import { isObject } from "../helpers/isObject.js";
 import { mapSubscription } from "../helpers/map-subscription.js";
 import { toFixed } from "../helpers/toFixed.js";
 import Subscription from "../models/subscriptionModel.js";
 import User from "../models/userModel.js";
 import UserStripeInfo from "../models/userStripeInfoModal.js";
-import { isAuth } from "../utils.js";
+import { getGiftSub, getStripeSubscription, giftSubValid, isAuth, is_subscribed, stripeSubValid } from "../utils.js";
 
 const userSubscriptionRouter = express.Router();
 
@@ -16,32 +17,21 @@ userSubscriptionRouter.get(
     isAuth,
     expressAsyncHandler(async (req, res) => {
         try {
-            const userStripeInfo = await UserStripeInfo.findOne({ user: req.user._id });
-            if (!userStripeInfo)
-                return res
-                    .status(500)
-                    .json({ message: "Can't Get your current subscription at the moment, please try again later." });
+            const resMsg = {
+                message: "You're Not Subscribed, Please Subscribe to access this feature.",
+                redirect: "/page/subscriptions",
+            };
 
-            if (!userStripeInfo.sub)
-                return res.status(404).json({
-                    message: "You're Not Subscribed, Please Subscribe to access this feature.",
-                    redirect: "/page/subscriptions",
-                });
+            const subscribed = await is_subscribed(req.user);
+            if (!subscribed) return res.status(404).json(resMsg);
 
-            const stripe = await getStripe();
+            const giftSub = await getGiftSub(req.user);
+            if (await giftSubValid(giftSub)) return res.status(200).json({ giftSub });
 
-            let stripe_sub;
+            const stripeSub = await getStripeSubscription(req.user);
+            if (stripeSubValid(stripeSub)) return res.status(200).json(await mapSubscription(stripeSub));
 
-            try {
-                stripe_sub = await stripe.subscriptions.retrieve(userStripeInfo.sub);
-            } catch (error) {
-                return res.status(404).json({
-                    message: "You're Not Subscribed, Please Subscribe to access this feature.",
-                    redirect: "/page/subscriptions",
-                });
-            }
-
-            return res.status(200).json(await mapSubscription(stripe_sub));
+            return res.status(404).json(resMsg);
         } catch (error) {
             console.log(error);
             return res.status(500).json(error);
@@ -53,16 +43,23 @@ userSubscriptionRouter.post(
     "/subscribe",
     isAuth,
     expressAsyncHandler(async (req, res) => {
-        const user = req.user;
-        const { subscriptionId, charge_period = "month" } = req.body;
-
-        if (charge_period !== "month" && charge_period !== "year") charge_period = "month";
-
         try {
+            const user = req.user;
+
+            const giftSub = await getGiftSub(user);
+            if (await giftSubValid(giftSub))
+                return res
+                    .status(401)
+                    .json({ message: "You have a valid subscription gift!", redirect: "/page/subscriptions" });
+
+            const { subscriptionId, charge_period = "month" } = req.body;
+
+            if (charge_period !== "month" && charge_period !== "year") charge_period = "month";
+
             const targetedSub = await Subscription.findById(subscriptionId);
             if (!targetedSub) return res.status(404).json({ message: "Subscription not found" });
 
-            const userStripeInfo = await UserStripeInfo.findOne({ user: user._id });
+            let userStripeInfo = await UserStripeInfo.findOne({ user: user._id });
             if (!userStripeInfo)
                 return res
                     .status(500)
@@ -95,9 +92,30 @@ userSubscriptionRouter.post(
             }
 
             let current_sub = null;
+            if (userStripeInfo.sub) {
+                try {
+                    current_sub = await stripe.subscriptions.retrieve(userStripeInfo.sub);
+                } catch (error) {}
+            }
 
-            if (userStripeInfo.sub) current_sub = await stripe.subscriptions.retrieve(userStripeInfo.sub);
-            const customer = await stripe.customers.retrieve(userStripeInfo.customer);
+            let customer;
+            try {
+                customer = await stripe.customers.retrieve(userStripeInfo.customer);
+                if (customer.deleted) {
+                    customer = await stripe.customers.create({
+                        name: user.name,
+                        email: user.email,
+                        metadata: {
+                            userId: user._id,
+                        },
+                        test_clock: test_clock.id,
+                    });
+                    userStripeInfo.customer = customer.id;
+                    userStripeInfo = await userStripeInfo.save();
+                }
+            } catch (error) {
+                console.log(error);
+            }
 
             if (!customer.invoice_settings.default_payment_method)
                 return res.status(401).json({

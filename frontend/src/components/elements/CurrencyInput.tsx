@@ -17,8 +17,13 @@ const CurrencyInput: FC<CurrencyInputProps> = ({ className = "", value, row, ...
     const currency = useSelector(currencySelector);
 
     return (
-        <div className={classNames("flex gap-2", { "flex-col": !row, "items-center": row })}>
-            <AppInput {...rest} value={value} type="number" className={classNames("", { [className]: className })} />
+        <div className={classNames("flex gap-2 w-full", { "flex-col": !row, "items-center": row })}>
+            <AppInput
+                {...rest}
+                value={value}
+                type="number"
+                className={classNames("w-full", { [className]: className })}
+            />
             {currency !== GBP && value && (
                 <Paragraph className="text-sm text-accent">
                     {!row && "Converted to your currency:"} <CurrencyConvert amount={parseFloat(value.toString())} />

@@ -3,10 +3,10 @@ import UserStripeInfo from "../../../../models/userStripeInfoModal.js";
 import Subscription from "../../../../models/subscriptionModel.js";
 
 export async function customerSubscriptionDeleted(event, io) {
-    const { object } = event.data;
-    let { expecting_downgrade } = object.metadata;
-
     try {
+        const { object } = event.data;
+        let { expecting_downgrade } = object.metadata;
+
         if (!expecting_downgrade) throw new Error("No subscription is waiting");
         const { targeted_sub_id, charge_period } = JSON.parse(expecting_downgrade);
 
@@ -48,6 +48,8 @@ export async function customerSubscriptionDeleted(event, io) {
 
         return { success: true };
     } catch (error) {
+        const { object } = event.data;
+
         const userStripeInfo = await UserStripeInfo.findOne({ sub: object.id });
         if (userStripeInfo) {
             userStripeInfo.sub = null;

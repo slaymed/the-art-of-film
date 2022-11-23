@@ -64,9 +64,9 @@ cartRouter.post(
     "/add",
     isAuth,
     expressAsyncHandler(async (req, res) => {
-        const { productId } = req.body;
-
         try {
+            const { productId } = req.body;
+
             const product = await Product.findById(productId);
             if (!product) return res.status(404).json({ message: "Product not found" });
 
@@ -117,9 +117,9 @@ cartRouter.post(
     "/shipping-address",
     isAuth,
     expressAsyncHandler(async (req, res) => {
-        const { address, city, postalCode, code, country } = req.body;
-
         try {
+            const { address, city, postalCode, code, country } = req.body;
+
             const cart = await getCart(req.user);
 
             cart.shippingAddress = { address, city, postalCode, code, country };

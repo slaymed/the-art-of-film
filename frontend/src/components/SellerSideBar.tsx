@@ -5,7 +5,6 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "../hooks/useDispatch";
 
 import { fetchingUserOperation, user } from "../store/auth/selectors";
-import { symbolSelector } from "../store/currency/selectors";
 import { signout } from "../store/auth/thunks";
 import { GlobalMessage, ThunkResponseType } from "../store/types";
 import { RequestLifeCycle } from "../store/enums";
@@ -13,6 +12,8 @@ import { RequestLifeCycle } from "../store/enums";
 import TextHeader from "./elements/TextHeader";
 import LoadingBox from "./kits/LoadingBox";
 import SideBarLink from "./kits/SideBarLink";
+import { SelectedList } from "../screens/OrdersScreen";
+import CurrencyConvert from "./kits/CurrencyConvert";
 
 export interface SellerSideBarProps extends ComponentProps<"div"> {}
 
@@ -21,7 +22,6 @@ const SellerSideBar: FC<SellerSideBarProps> = ({ className = "", ...rest }) => {
 
     const userInfo = useSelector(user);
     const { loading } = useSelector(fetchingUserOperation);
-    const symbol = useSelector(symbolSelector);
 
     const logout = useCallback(async () => {
         const res = await dispatch(signout());
@@ -68,15 +68,26 @@ const SellerSideBar: FC<SellerSideBarProps> = ({ className = "", ...rest }) => {
                 }
             )}
         >
-            <div className="flex items-center justify-between p-2 bg-gradient-to-tl from-accent/5 to-accent/20">
-                <TextHeader className="text-xl">Available</TextHeader>
-                <TextHeader className="text-xl">
-                    {symbol} {userInfo.availableBalance}
-                </TextHeader>
+            <div className="flex flex-col p-2 bg-gradient-to-tl from-accent/5 to-accent/20">
+                <div className="flex justify-between items-center">
+                    <TextHeader className="text-xl">Available</TextHeader>
+                    <TextHeader className="text-xl">
+                        <CurrencyConvert amount={userInfo.availableBalance} />
+                    </TextHeader>
+                </div>
+                {userInfo.pendingBalance > 0 && (
+                    <div className="flex justify-between items-center">
+                        <TextHeader className="text-xl">Pending</TextHeader>
+                        <TextHeader className="text-xl">
+                            <CurrencyConvert amount={userInfo.pendingBalance} />
+                        </TextHeader>
+                    </div>
+                )}
             </div>
+
             {userInfo.availableBalance > 0 && (
                 <SideBarLink
-                    to="/place-your-withdraw-request"
+                    to="/new-withdraw-request"
                     iconClasses="fas fa-solid fa-money-check-dollar"
                     text="Withdraw"
                 />
@@ -85,11 +96,20 @@ const SellerSideBar: FC<SellerSideBarProps> = ({ className = "", ...rest }) => {
             <SideBarLink to="/posters/create" iconClasses="fas fa-list" text="Create Poster" />
             <SideBarLink to="/posters/seller" iconClasses="fas fa-list" text="Poster List" />
             <SideBarLink to="/my-subscription" iconClasses="fas fa-list" text="My Subscriptions" />
+            <SideBarLink to="/purchaced-gifts" iconClasses="fa-solid fa-gift" text="Purchaced Gifts" />
             <SideBarLink to={`/seller/${userInfo._id}`} iconClasses="fas fa-images" text="My ShowCase" />
             <TextHeader className="text-xl text-tcolor">Selling</TextHeader>
-            <SideBarLink to="/orderlist/seller" iconClasses="fas fa-clipboard" text="Customer Orders" />
+            <SideBarLink
+                to={`/orders?pannel=${SelectedList.C_O}`}
+                iconClasses="fas fa-clipboard"
+                text="Customers Orders"
+            />
             <TextHeader className="text-xl text-tcolor">Buying</TextHeader>
-            <SideBarLink to="/orderhistory" iconClasses="fas fa-clipboard" text="Purchase Orders" />
+            <SideBarLink
+                to={`/orders?pannel=${SelectedList.M_O}`}
+                iconClasses="fas fa-clipboard"
+                text="Purchase Orders"
+            />
             <TextHeader className="text-xl text-tcolor">Payments Settings</TextHeader>
             <SideBarLink to="/payment-methods" iconClasses="fas fa-credit-card" text="All Payment Methods" />
             <SideBarLink to="/payment-methods/credit-cards" iconClasses="fas fa-credit-card" text="Credit Cards" />

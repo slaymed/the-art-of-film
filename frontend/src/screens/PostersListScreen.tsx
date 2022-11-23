@@ -1,19 +1,23 @@
 import React, { FC, ComponentProps, useState, useMemo, useCallback } from "react";
 import classNames from "classnames";
-import Paragraph from "../components/elements/Paragraph";
-import PageLayout from "../layout/PageLayout";
-import { Link } from "react-router-dom";
-import FilterCard from "../components/cards/FilterCard";
 import { useSelector } from "react-redux";
-import { fetchingMyProducts, myProductsSelector } from "../store/products/selectors";
+import { Link } from "react-router-dom";
+
+import Paragraph from "../components/elements/Paragraph";
+import FilterCard from "../components/cards/FilterCard";
 import LoadingBox from "../components/kits/LoadingBox";
 import ErrorWithRedirect from "../components/kits/ErrorWithRedirect";
-import { useDispatch } from "../hooks/useDispatch";
-import { deletePoster, fetchMyProducts } from "../store/products/thunks";
-import H1 from "../components/elements/H1";
 import CurrencyConvert from "../components/kits/CurrencyConvert";
-import Button from "../components/elements/Button";
 import Paginator from "../components/kits/Paginator";
+import RefetchButton from "../components/kits/RefetchButton";
+import Button from "../components/elements/Button";
+import H1 from "../components/elements/H1";
+import PageLayout from "../layout/PageLayout";
+
+import { useDispatch } from "../hooks/useDispatch";
+
+import { deletePoster, fetchMyProducts } from "../store/products/thunks";
+import { fetchingMyProducts, myProductsSelector } from "../store/products/selectors";
 
 export interface PostersListScreenProps extends ComponentProps<"div"> {}
 
@@ -54,15 +58,7 @@ const PostersListScreen: FC<PostersListScreenProps> = ({ className = "", ...rest
                 <div className="flex justify-between items-center space-x-4">
                     <H1 className="text-xl sm:text-4xl tracking-widest text-accent uppercase">My Posters</H1>
                     <div className="flex items-center space-x-4">
-                        <Button
-                            className="flex py-0.5 px-2 rounded bg-accent/20 hover:bg-accent hover:text-black items-center space-x-2 text-accent"
-                            type="button"
-                            onClick={refetch}
-                        >
-                            <span>
-                                <i className="text-sm sm:text-xl fa fa-refresh" aria-hidden="true" />
-                            </span>
-                        </Button>
+                        <RefetchButton onClick={refetch} />
                         <Link to="/posters/create">
                             <Paragraph className="text-xs sm:text-lg text-accent underline underline-offset-2">
                                 New Poster

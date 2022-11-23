@@ -32,3 +32,8 @@ export const subscribing = createSelector(
     (state: RootState) => state.subscriptions.subscribe,
     (subscribing: GlobalOperation) => subscribing
 );
+
+export const redeemOperation = createSelector(
+    (state: RootState) => state.subscriptions.redeem,
+    (redeem: GlobalOperation) => redeem
+);

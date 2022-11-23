@@ -1,17 +1,20 @@
-import Stripe from "stripe";
+import voucher from "voucher-code-generator";
+
+import getStripe from "../../../../helpers/get-stripe.js";
 import Advertise from "../../../../models/advertiseModel.js";
 import Chat from "../../../../models/chatModel.js";
+import Gift from "../../../../models/giftModal.js";
 import Order from "../../../../models/orderModel.js";
 import Product from "../../../../models/productModel.js";
 import Session from "../../../../models/sessionModel.js";
-import Setting from "../../../../models/settingModel.js";
 import Socket from "../../../../models/socketModal.js";
 import User from "../../../../models/userModel.js";
 
 export async function paymentIntentSucceeded(event, io) {
-    const { object } = event.data;
-    const { ref, socketId } = object.metadata;
     try {
+        const { object } = event.data;
+        const { ref, socketId } = object.metadata;
+
         const session = await Session.findOne({ ref });
         if (!session) throw new Error("Session Not Found");
 
@@ -83,6 +86,18 @@ export async function paymentIntentSucceeded(event, io) {
                 }
 
                 break;
+            case "gift":
+                const gift = await Gift.findById(session.ref);
+                if (!gift) throw new Error("Gift not found");
+
+                const [code] = voucher.generate({ length: 16, count: 1 });
+
+                gift.is_paid = true;
+                gift.paid_at = new Date().getTime();
+                gift.code = code;
+
+                await gift.save();
+                break;
             default:
                 throw new Error(`${session.type} Must be supported in payment-intent.succeeded event`);
         }
@@ -98,11 +113,12 @@ export async function paymentIntentSucceeded(event, io) {
 
         return { success: true };
     } catch (error) {
+        const { object } = event.data;
+        const { ref } = object.metadata;
+
         const session = await Session.findOne({ ref });
         if (!session) return { success: false, message: error.message, detail: "Failed In Payment Intent Succeeded" };
-        const { stripe_private_key } = await Setting.findOne();
-        const stripe = new Stripe(stripe_private_key);
-
+        const stripe = await getStripe();
         await stripe.refunds.create({ payment_intent: session.payment_intent_id });
         return { success: false, message: error.message, detail: "Refund Payment" };
     }

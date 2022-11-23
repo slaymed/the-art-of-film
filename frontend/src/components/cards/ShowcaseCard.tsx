@@ -14,6 +14,9 @@ export interface ShowcaseCardProps extends ComponentProps<"div"> {
     linkText?: string;
     reverse?: boolean;
     showBorder?: boolean;
+    maxImageWidthClasses?: string;
+    imageEnd?: boolean;
+    cutString?: boolean;
 }
 
 const ShowcaseCard: FC<ShowcaseCardProps> = ({
@@ -26,6 +29,9 @@ const ShowcaseCard: FC<ShowcaseCardProps> = ({
     linkText,
     reverse = false,
     showBorder = false,
+    maxImageWidthClasses = "",
+    imageEnd,
+    cutString = true,
     ...rest
 }) => {
     return (
@@ -45,7 +51,11 @@ const ShowcaseCard: FC<ShowcaseCardProps> = ({
                     <TextHeader className="text-3xl sm:text-5xl xl:text-6xl">
                         <span className="text-accent">{before}</span> {title}
                     </TextHeader>
-                    <Paragraph className="text-md line-clamp-6 2xl:line-clamp-none hover:line-clamp-none sm:text-lg">
+                    <Paragraph
+                        className={classNames("text-md sm:text-lg", {
+                            "line-clamp-6 2xl:line-clamp-none hover:line-clamp-none": cutString,
+                        })}
+                    >
                         {text}
                     </Paragraph>
                 </div>
@@ -58,9 +68,12 @@ const ShowcaseCard: FC<ShowcaseCardProps> = ({
             <div className="w-full">
                 <img
                     src={image}
-                    alt=""
-                    className={classNames("max-w-full max-h-[400px] object-contain lg:max-h-[500px]", {
-                        "border-2 border-accent": showBorder,
+                    alt="Poster"
+                    className={classNames("max-w-full object-contain", {
+                        "border-4 border-accent": showBorder,
+                        "max-h-[400px] lg:max-h-[500px]": !maxImageWidthClasses,
+                        [maxImageWidthClasses]: maxImageWidthClasses,
+                        "ml-auto": imageEnd,
                     })}
                 />
             </div>

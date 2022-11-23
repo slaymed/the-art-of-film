@@ -27,11 +27,11 @@ tagsRouter.post(
     "/create",
     isAuth,
     expressAsyncHandler(async (req, res) => {
-        const { name, type } = req.body;
-
-        let created;
-
         try {
+            const { name, type } = req.body;
+
+            let created;
+
             switch (type) {
                 case "Cast":
                     created = await Cast.findOne({ name });

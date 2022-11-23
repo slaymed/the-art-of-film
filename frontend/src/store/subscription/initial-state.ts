@@ -8,4 +8,5 @@ export const SubscriptionInitialState: ISubscriptionState = {
     current: null,
     [FETCH_CURRENT_SUB]: LazyOperationInitialState,
     [SUBSCRIBE]: OperationInitialState,
+    redeem: OperationInitialState,
 };

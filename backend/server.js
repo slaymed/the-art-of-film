@@ -6,20 +6,19 @@ import dotenv from "dotenv";
 import path from "path";
 import cors from "cors";
 import { Server } from "socket.io";
+import { Worker } from "worker_threads";
 
 import productRouter from "./routers/productRouter.js";
 import userRouter from "./routers/userRouter.js";
 import orderRouter from "./routers/orderRouter.js";
 import uploadRouter from "./routers/uploadRouter.js";
-
 import subscriptionRouter from "./routers/subscriptionRouter.js";
-
 import userSubscriptionRouter from "./routers/userSubscriptionRouter.js";
+import subscriptionGiftsRouter from "./routers/subscriptionGiftsRouter.js";
+import giftsRouter from "./routers/giftsRouter.js";
 import userStripeInfoRouter from "./routers/userStripeInfoRouter.js";
-
 import sessionRouter from "./routers/sessionRouter.js";
 import issueRouter from "./routers/issueRouter.js";
-import settingsRouter from "./routers/settingsRouter.js";
 import advertiseRouter from "./routers/advertiseRouter.js";
 import webhooksRouter from "./routers/webhooks/index.js";
 import globalRouter from "./routers/globalRouter.js";
@@ -28,6 +27,7 @@ import chatRouter from "./routers/chatRouter.js";
 import Socket from "./models/socketModal.js";
 import tagsRouter from "./routers/tagsRouter.js";
 import sellerShowcaseRouter from "./routers/sellerShowcaseRouter.js";
+import withdrawRequestsRouter from "./routers/withdrawRequestsRouter.js";
 
 dotenv.config();
 
@@ -54,19 +54,18 @@ mongoose.connect(
 app.use("/webhooks", webhooksRouter);
 app.use("/api/uploads", uploadRouter);
 app.use("/api/users", userRouter);
-
 app.use("/api/subscriptions", subscriptionRouter);
-
 app.use("/api/user-subscription", userSubscriptionRouter);
+app.use("/api/subscription-gifts", subscriptionGiftsRouter);
+app.use("/api/gifts", giftsRouter);
 app.use("/api/seller-showcase", sellerShowcaseRouter);
 app.use("/api/user-stripe-info", userStripeInfoRouter);
-
+app.use("/api/withdraw-requests", withdrawRequestsRouter);
 app.use("/api/products", productRouter);
 app.use("/api/posters-tags", tagsRouter);
 app.use("/api/issues", issueRouter);
 app.use("/api/orders", orderRouter);
 app.use("/api/sessions", sessionRouter);
-app.use("/api/settings", settingsRouter);
 app.use("/api/advertise", advertiseRouter);
 app.use("/api/globals", globalRouter);
 app.use("/api/cart", cartRouter);
@@ -104,6 +103,8 @@ io.on("connection", async (socket) => {
         if (saved) await saved.remove();
     });
 });
+
+new Worker("./backend/workers/collector.js");
 
 server.listen(port, async () => {
     const sockets = await Socket.find();

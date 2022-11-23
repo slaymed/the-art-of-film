@@ -1,4 +1,5 @@
 import { Period } from "../enums";
+import { IGift } from "../gifts/types";
 import { GlobalOperation, TimeStamp } from "./../types";
 import { GOLD, PLATINUM, SILVER } from "./constants";
 import { SubscriptionStatus } from "./enums";
@@ -35,6 +36,18 @@ export type MappedSub = {
     sub: ISubscription;
 };
 
+export interface GiftSub extends TimeStamp {
+    _id: string;
+    active: boolean;
+    cancel_at: number;
+    start_date: number;
+    user: string;
+    gift: IGift;
+    targeted_sub: string;
+    period: Period;
+    period_time: number;
+}
+
 export type NextSub = {
     charge_period: Period;
     start_date: number;
@@ -49,9 +62,10 @@ export type Invoice = {
 };
 
 export type CurrentSub = {
-    sub_data: MappedSub;
+    sub_data?: MappedSub;
     next_sub_data?: NextSub;
-    invoice: Invoice;
+    invoice?: Invoice;
+    giftSub?: GiftSub;
 };
 
 export type SubscribeParams = {
@@ -64,5 +78,6 @@ export interface ISubscriptionState {
     fetchingAvailable: GlobalOperation;
     current: CurrentSub | null;
     fetchingCurrentSub: GlobalOperation;
+    redeem: GlobalOperation;
     subscribe: GlobalOperation;
 }

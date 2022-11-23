@@ -18,8 +18,9 @@ advertiseRouter.get(
 advertiseRouter.post(
     "/",
     expressAsyncHandler(async (req, res) => {
-        const { title, image, type, link } = req.body;
         try {
+            const { title, image, type, link } = req.body;
+
             const advertise = await Advertise.create({
                 title,
                 image,

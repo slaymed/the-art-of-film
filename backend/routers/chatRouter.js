@@ -13,10 +13,10 @@ chatRouter.get(
     "/list/:orderId",
     isAuth,
     expressAsyncHandler(async (req, res) => {
-        const { orderId } = req.params;
-        const user = req.user;
-
         try {
+            const { orderId } = req.params;
+            const user = req.user;
+
             const order = await Order.findById(orderId);
             if (!order) return res.status(404).json({ message: "Chat not found" });
 
@@ -63,15 +63,15 @@ chatRouter.post(
     "/send-message/:chatId",
     isAuth,
     expressAsyncHandler(async (req, res) => {
-        const user = req.user;
-        const { chatId } = req.params;
-        const { body } = req.body;
-        const io = req.app.locals.settings.io;
-
-        if (typeof body !== "string" || !body.trim())
-            return res.status(401).json({ message: "Message body can't be empty" });
-
         try {
+            const user = req.user;
+            const { chatId } = req.params;
+            const { body } = req.body;
+            const io = req.app.locals.settings.io;
+
+            if (typeof body !== "string" || !body.trim())
+                return res.status(401).json({ message: "Message body can't be empty" });
+
             const chat = await Chat.findById(chatId).populate("messages");
             if (!chat) return res.status(404).json({ message: "Chat not found" });
 
@@ -115,11 +115,11 @@ chatRouter.get(
     "/read/:chatId",
     isAuth,
     expressAsyncHandler(async (req, res) => {
-        const user = req.user;
-        const { chatId } = req.params;
-        const io = req.app.locals.settings.io;
-
         try {
+            const user = req.user;
+            const { chatId } = req.params;
+            const io = req.app.locals.settings.io;
+
             const chat = await Chat.findById(chatId).populate("messages");
             if (!chat) return res.status(404).json({ message: "Chat not found" });
 

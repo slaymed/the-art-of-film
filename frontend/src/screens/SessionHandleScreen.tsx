@@ -1,6 +1,7 @@
 import React, { FC, ComponentProps, useCallback, useEffect } from "react";
 import classNames from "classnames";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 import { useDispatch } from "../hooks/useDispatch";
 
@@ -16,14 +17,16 @@ import { ISession } from "../store/stripe/types";
 import { RequestLifeCycle } from "../store/enums";
 import { fetchOrders, syncOrder } from "../store/orders/thunks";
 import { GlobalMessage, RealtimeResponseType, ThunkResponseType } from "../store/types";
+import { fetchMyGifts, syncGift } from "../store/gifts/thunks";
+import { fetchChatListObject, fetchOrderChat } from "../store/chat/thnuks";
 
 import { socket } from "../App";
-import { fetchChatListObject, fetchOrderChat } from "../store/chat/thnuks";
 
 export interface SessionHandleScreenProps extends ComponentProps<"div"> {}
 
 const SessionHandleScreen: FC<SessionHandleScreenProps> = ({ className = "", ...rest }) => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const session = useSelector(currentSession);
 
@@ -44,7 +47,7 @@ const SessionHandleScreen: FC<SessionHandleScreenProps> = ({ className = "", ...
             case SessionType.POSTER:
                 window.location.href = "/shop";
                 break;
-            case SessionType.SUBSCRIPTION:
+            case SessionType.GIFT:
                 break;
             default:
                 console.log(`${session.type} is not supported yet`);
@@ -64,13 +67,15 @@ const SessionHandleScreen: FC<SessionHandleScreenProps> = ({ className = "", ...
                     dispatch(syncOrder(session.ref));
                     dispatch(fetchOrderChat(session.ref));
                     break;
-                case SessionType.SUBSCRIPTION:
+                case SessionType.GIFT:
+                    dispatch(syncGift(session.ref));
+                    navigate(`/purchaced-gifts/${session.ref}`);
                     break;
                 default:
                     console.log(`${session.type} is not supported yet`);
             }
         },
-        [dispatch]
+        [dispatch, navigate]
     );
     useEffect(() => {
         socket.on("checkout-session-paid", paid);
@@ -90,7 +95,8 @@ const SessionHandleScreen: FC<SessionHandleScreenProps> = ({ className = "", ...
                     dispatch(fetchOrders());
                     dispatch(fetchChatListObject());
                     break;
-                case SessionType.SUBSCRIPTION:
+                case SessionType.GIFT:
+                    dispatch(fetchMyGifts());
                     break;
                 default:
                     console.log(`${session.type} is not supported yet`);

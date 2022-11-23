@@ -1,15 +1,16 @@
 import Advertise from "../../../../models/advertiseModel.js";
 import Chat from "../../../../models/chatModel.js";
+import Gift from "../../../../models/giftModal.js";
 import Order from "../../../../models/orderModel.js";
 import Session from "../../../../models/sessionModel.js";
 import Socket from "../../../../models/socketModal.js";
 import User from "../../../../models/userModel.js";
 
 export async function chargeRefunded(event, io) {
-    const { object } = event.data;
-    const { ref, socketId } = object.metadata;
-
     try {
+        const { object } = event.data;
+        const { ref, socketId } = object.metadata;
+
         const session = await Session.findOne({ payment_intent_id: object.payment_intent, ref });
 
         session.refund = {
@@ -52,6 +53,9 @@ export async function chargeRefunded(event, io) {
                     await order.remove();
                 }
                 break;
+            case "gift":
+                const gift = await Gift.findById(session.ref);
+                if (gift) await gift.remove();
             default:
                 throw new Error(`${session.type} Must be supported in charge.refunded event`);
         }

@@ -8,7 +8,7 @@ export interface PrivacyScreenProps extends ComponentProps<"div"> {}
 
 const PrivacyScreen: FC<PrivacyScreenProps> = ({ className = "", ...rest }) => {
     return (
-        <div {...rest} className={classNames("", { [className]: className })}>
+        <div {...rest} className={classNames("bg-light-dark", { [className]: className })}>
             <HeroSection heading="Privacy Policy" heading2="Home/Privacy" image="/images/theater.jpeg" />
 
             <div className="p-8 sm:p-16 container mx-auto">

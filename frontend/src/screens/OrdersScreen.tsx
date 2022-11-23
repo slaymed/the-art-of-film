@@ -1,26 +1,28 @@
-import React, { FC, ComponentProps, useState, memo, useMemo, useCallback } from "react";
+import React, { FC, ComponentProps, useState, memo, useMemo, useEffect } from "react";
 import classNames from "classnames";
 import { useSelector } from "react-redux";
 import { Tab } from "@headlessui/react";
 import { useSearchParams } from "react-router-dom";
 
 import { fetchingOrders, ordersList } from "../store/orders/selectors";
-import H1 from "../components/elements/H1";
 import { user } from "../store/auth/selectors";
-import LoadingBox from "../components/kits/LoadingBox";
-import OrderInfoCard from "../components/cards/OrderInfoCard";
 
 import Paragraph from "../components/elements/Paragraph";
 import MessageBox from "../components/kits/MessageBox";
+import H1 from "../components/elements/H1";
+import LoadingBox from "../components/kits/LoadingBox";
+import OrderInfoCard from "../components/cards/OrderInfoCard";
+
+import { usp_prev } from "../helpers/get-url-search-stream-previous-values";
 
 export interface OrdersScreenProps extends ComponentProps<"div"> {}
 
-enum SelectedList {
+export enum SelectedList {
     C_O = "clients-orders",
     M_O = "my-orders",
 }
 
-enum Filters {
+export enum Filters {
     P = "paid",
     U_P = "unpaid",
     R = "recieved",
@@ -30,13 +32,16 @@ enum Filters {
 }
 
 const OrdersScreen: FC<OrdersScreenProps> = ({ className = "", ...rest }) => {
-    const [urlSearchParams, setSearchParams] = useSearchParams();
+    const [usp, setUsp] = useSearchParams();
     const orders = useSelector(ordersList);
     const userInfo = useSelector(user);
     const { loading } = useSelector(fetchingOrders);
 
-    const [sl, setSl] = useState<SelectedList>((urlSearchParams.get("pannel") as any) || SelectedList.C_O);
-    const [filter, setFilter] = useState<Filters>(urlSearchParams.get("filters") as any);
+    const pannel = (usp.get("pannel") || SelectedList.C_O) as SelectedList;
+    const filters = (usp.get("filters") || Filters.NULL) as Filters;
+
+    const [sl, setSl] = useState<SelectedList>(pannel);
+    const [filter, setFilter] = useState<Filters>(filters);
 
     const list = useMemo(() => {
         if (!orders || orders.length === 0 || !userInfo) return [];
@@ -62,21 +67,22 @@ const OrdersScreen: FC<OrdersScreenProps> = ({ className = "", ...rest }) => {
         }
     }, [filter, list]);
 
-    const updateFilter = useCallback(
-        (filter: Filters) => {
-            setFilter((prev) => (prev === filter ? Filters.NULL : filter));
-            setSearchParams((prev) => ({ ...prev, filters: filter as any }));
-        },
-        [setSearchParams]
-    );
+    const updateFilter = (newFilter: Filters) => {
+        if (newFilter === filter) newFilter = Filters.NULL;
+        setUsp((prev) => ({ ...usp_prev(prev), filters: newFilter as any }));
+    };
 
-    const updatePannel = useCallback(
-        (pannel: SelectedList) => {
-            setSl(pannel);
-            setSearchParams((prev) => ({ ...prev, pannel }));
-        },
-        [setSearchParams]
-    );
+    const updatePannel = (pannel: SelectedList) => {
+        setUsp((prev) => ({ ...usp_prev(prev), pannel }));
+    };
+
+    useEffect(() => {
+        setSl(pannel);
+    }, [pannel]);
+
+    useEffect(() => {
+        setFilter(filters);
+    }, [filters]);
 
     if (!userInfo) return null;
 

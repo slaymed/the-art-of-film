@@ -35,9 +35,9 @@ userStripeInfoRouter.post(
     "/make-card-default",
     isAuth,
     expressAsyncHandler(async (req, res) => {
-        const { pm_id } = req.body;
-
         try {
+            const { pm_id } = req.body;
+
             const userStripeInfo = await UserStripeInfo.findOne({ user: req.user._id });
             if (!userStripeInfo)
                 return res
@@ -124,9 +124,9 @@ userStripeInfoRouter.post(
     "/credit-card/delete",
     isAuth,
     expressAsyncHandler(async (req, res) => {
-        const { pm_id } = req.body;
-
         try {
+            const { pm_id } = req.body;
+
             const userStripeInfo = await UserStripeInfo.findOne({ user: req.user._id });
             if (!userStripeInfo)
                 return res
@@ -170,50 +170,51 @@ userStripeInfoRouter.post(
     "/add-credit-card",
     isAuth,
     expressAsyncHandler(async (req, res) => {
-        let {
-            number,
-            exp_month,
-            exp_year,
-            cvc,
-            address,
-            name,
-            useMyAccountName = false,
-            useMyAccountAddress = true,
-            phone,
-        } = req.body;
-
-        const errors = {};
-
-        if (typeof number !== "number" || number.toString().length < 16) errors.number = "Must be a valid card number";
-        if (typeof exp_month !== "number" || exp_month.toString().length < 1)
-            errors.exp_month = "Must be a valid month date";
-        if (typeof exp_year !== "number" || exp_year.toString().length < 4)
-            errors.exp_year = "Must be a valid year date";
-        if (typeof cvc !== "string" || cvc.length < 3) errors.cvc = "Must be a valid cvc";
-        if (!useMyAccountName && (typeof name !== "string" || !name.trim()))
-            errors.name = "Must not be empty or enable to use account name";
-        if (typeof phone !== "string" || !phone.trim()) errors.phone = "Must not be empty";
-
-        if (!useMyAccountAddress) {
-            for (const field of ["city", "country", "line1", "postal_code", "state"])
-                if (typeof address[field] !== "string" || !address[field].trim()) {
-                    if (!errors.address) errors.address = {};
-                    errors.address[field] = "Must not be empty";
-                }
-        }
-
-        if (useMyAccountAddress) {
-            address = {};
-            if (req.user.address) address.line1 = req.user.address;
-            if (req.user.city) address.city = req.user.city;
-            if (req.user.code) address.country = req.user.code;
-            if (req.user.postalCode) address.postal_code = req.user.postalCode;
-            if (Object.keys(address).length === 0) address = undefined;
-        }
-
-        if (hasErrors(errors)) return res.status(401).json(errors);
-
         try {
+            let {
+                number,
+                exp_month,
+                exp_year,
+                cvc,
+                address,
+                name,
+                useMyAccountName = false,
+                useMyAccountAddress = true,
+                phone,
+            } = req.body;
+
+            const errors = {};
+
+            if (typeof number !== "number" || number.toString().length < 16)
+                errors.number = "Must be a valid card number";
+            if (typeof exp_month !== "number" || exp_month.toString().length < 1)
+                errors.exp_month = "Must be a valid month date";
+            if (typeof exp_year !== "number" || exp_year.toString().length < 4)
+                errors.exp_year = "Must be a valid year date";
+            if (typeof cvc !== "string" || cvc.length < 3) errors.cvc = "Must be a valid cvc";
+            if (!useMyAccountName && (typeof name !== "string" || !name.trim()))
+                errors.name = "Must not be empty or enable to use account name";
+            if (typeof phone !== "string" || !phone.trim()) errors.phone = "Must not be empty";
+
+            if (!useMyAccountAddress) {
+                for (const field of ["city", "country", "line1", "postal_code", "state"])
+                    if (typeof address[field] !== "string" || !address[field].trim()) {
+                        if (!errors.address) errors.address = {};
+                        errors.address[field] = "Must not be empty";
+                    }
+            }
+
+            if (useMyAccountAddress) {
+                address = {};
+                if (req.user.address) address.line1 = req.user.address;
+                if (req.user.city) address.city = req.user.city;
+                if (req.user.code) address.country = req.user.code;
+                if (req.user.postalCode) address.postal_code = req.user.postalCode;
+                if (Object.keys(address).length === 0) address = undefined;
+            }
+
+            if (hasErrors(errors)) return res.status(401).json(errors);
+
             const userStripeInfo = await UserStripeInfo.findOne({ user: req.user._id });
             if (!userStripeInfo)
                 return res

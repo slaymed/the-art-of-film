@@ -1,16 +1,12 @@
 import express from "express";
 import expressAsyncHandler from "express-async-handler";
 import bcrypt from "bcryptjs";
+
 import data from "../data.js";
 import User from "../models/userModel.js";
-import { generateToken, isAdmin, isAuth, isSeller } from "../utils.js";
-import Stripe from "stripe";
-import Setting from "../models/settingModel.js";
-import Subscription from "../models/subscriptionModel.js";
-// import crypto
+import { generateToken, isAuth } from "../utils.js";
 import crypto from "crypto";
 import { sendResetPasswordEmail } from "../helpers/mail.js";
-import Session from "../models/sessionModel.js";
 import Cart from "../models/cartModal.js";
 import Socket from "../models/socketModal.js";
 import getStripe from "../helpers/get-stripe.js";
@@ -34,8 +30,9 @@ userRouter.post(
     "/register-socket",
     isAuth,
     expressAsyncHandler(async (req, res) => {
-        const { socketId } = req.body;
         try {
+            const { socketId } = req.body;
+
             const found = await Socket.findOne({ socketId });
             if (!found) await new Socket({ socketId: req.body.socketId, user: req.user._id }).save();
             return res.status(200).json("done");
@@ -107,21 +104,22 @@ userRouter.post(
     "/update",
     isAuth,
     expressAsyncHandler(async (req, res) => {
-        const {
-            name,
-            password,
-            sellerName,
-            email,
-            logo,
-            description,
-            address,
-            city,
-            country,
-            code,
-            postalCode,
-            rolled_folded_shipping_cost,
-        } = req.body;
         try {
+            const {
+                name,
+                password,
+                sellerName,
+                email,
+                logo,
+                description,
+                address,
+                city,
+                country,
+                code,
+                postalCode,
+                rolled_folded_shipping_cost,
+            } = req.body;
+
             const user = await User.findById(req.user._id);
 
             if (name) user.name = name;

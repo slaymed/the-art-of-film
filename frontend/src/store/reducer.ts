@@ -15,6 +15,8 @@ import issuesReducer from "./issues/reducer";
 import tagsReducer from "./tags/reducer";
 import uiReducer from "./ui/reducer";
 import showcasesReducer from "./showcase/reducer";
+import withdrawRequestsReducer from "./withdraw-requests/reducer";
+import giftsReducer from "./gifts/reducer";
 
 export default combineReducers({
     auth: authReducer,
@@ -32,4 +34,6 @@ export default combineReducers({
     tags: tagsReducer,
     ui: uiReducer,
     showcases: showcasesReducer,
+    withdrawRequests: withdrawRequestsReducer,
+    gifts: giftsReducer,
 });

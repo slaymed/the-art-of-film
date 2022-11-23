@@ -6,14 +6,16 @@ import Session from "../models/sessionModel.js";
 import Setting from "../models/settingModel.js";
 import Advertise from "../models/advertiseModel.js";
 import Order from "../models/orderModel.js";
+import Gift from "../models/giftModal.js";
 
 const globalRouter = express.Router();
 
 globalRouter.post(
     "/cancel-checkout-session",
     expressAsyncHandler(async (req, res) => {
-        const { sessionId } = req.body;
         try {
+            const { sessionId } = req.body;
+
             const session = await Session.findOne({ id: sessionId });
             if (!session) return res.status(404).json({ message: "Checkout session not found" });
 
@@ -42,6 +44,9 @@ globalRouter.post(
                     const order = await Order.findById(session.ref);
                     if (order) await order.remove();
                     break;
+                case "gift":
+                    const gift = await Gift.findById(session.ref);
+                    if (gift) await gift.remove();
                 default:
                     return res.status(401).json({ message: `Removing ${session.type} is not supported yet` });
             }

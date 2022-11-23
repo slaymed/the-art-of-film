@@ -61,6 +61,14 @@ import PosterScreen from "./screens/PosterScreen";
 import SellerShowcaseScreen from "./screens/SellerShowcaseScreen";
 import SellersShowcasesListScreen from "./screens/SellersShowcasesListScreen";
 import ShippingDetailScreen from "./screens/ShippingDetailScreen";
+import TermsScreen from "./screens/TermsScreen";
+import WhyFilmPosters from "./screens/WhyFilmPosters";
+import WithdrawRequestsScreen from "./screens/WithdrawRequestsScreen";
+import WithdrawScreen from "./screens/WithdrawScreen";
+import BuyGiftSubScreen from "./screens/BuyGiftSubScreen";
+import PurchacedGiftsScreen from "./screens/PurchacedGiftsScreen";
+import GiftScreen from "./screens/GiftScreen";
+import RedeemGiftSubScreen from "./screens/RedeemGiftSubScreen";
 
 dayjs.extend(relativeTime);
 
@@ -225,6 +233,40 @@ function App() {
                         />
 
                         <Route
+                            path="/buy-gift-sub/:subscriptionId"
+                            element={
+                                <AuthRoute>
+                                    <BuyGiftSubScreen />
+                                </AuthRoute>
+                            }
+                        />
+
+                        <Route
+                            path="/purchaced-gifts"
+                            element={
+                                <AuthRoute>
+                                    <PurchacedGiftsScreen />
+                                </AuthRoute>
+                            }
+                        />
+                        <Route
+                            path="/purchaced-gifts/:giftId"
+                            element={
+                                <AuthRoute>
+                                    <GiftScreen />
+                                </AuthRoute>
+                            }
+                        />
+                        <Route
+                            path="/redeem-gift-sub"
+                            element={
+                                <AuthRoute>
+                                    <RedeemGiftSubScreen />
+                                </AuthRoute>
+                            }
+                        />
+
+                        <Route
                             path="/profile"
                             element={
                                 <AuthRoute>
@@ -269,6 +311,24 @@ function App() {
                             }
                         />
 
+                        <Route
+                            path="/new-withdraw-request"
+                            element={
+                                <AuthRoute>
+                                    <WithdrawScreen />
+                                </AuthRoute>
+                            }
+                        />
+
+                        <Route
+                            path="/withdraw-requests"
+                            element={
+                                <AuthRoute>
+                                    <WithdrawRequestsScreen />
+                                </AuthRoute>
+                            }
+                        />
+
                         <Route path="/poster/:posterId" element={<PosterScreen />} />
 
                         <Route path="/seller/:sellerId" element={<SellerShowcaseScreen />} />
@@ -284,6 +344,8 @@ function App() {
                         <Route path="/blog-page" element={<BlogScreen />} />
                         <Route path="/contact" element={<ContactScreen />} />
                         <Route path="/faq" element={<FAQScreen />} />
+                        <Route path="/terms" element={<TermsScreen />} />
+                        <Route path="/why-film-posters" element={<WhyFilmPosters />} />
                         <Route path="/reset/:token" element={<ResetPasswordScreen />} />
                     </Routes>
                 </main>
