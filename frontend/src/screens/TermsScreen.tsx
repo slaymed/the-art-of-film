@@ -1,13 +1,18 @@
 import React, { FC, ComponentProps } from "react";
 import classNames from "classnames";
+import { useSelector } from "react-redux";
 
 import TextHeader from "../components/elements/TextHeader";
 import Paragraph from "../components/elements/Paragraph";
 import HeroSection from "../components/sections/HeroSection";
 
+import { websiteSettings } from "../store/settings/selectors";
+
 export interface TermsScreenProps extends ComponentProps<"div"> {}
 
 const TermsScreen: FC<TermsScreenProps> = ({ className = "", ...rest }) => {
+    const settings = useSelector(websiteSettings);
+
     return (
         <div {...rest} className={classNames("bg-light-dark", { [className]: className })}>
             <HeroSection heading="Privacy Policy" heading2="Home/Privacy" image="/images/theater.jpeg" />
@@ -222,7 +227,11 @@ const TermsScreen: FC<TermsScreenProps> = ({ className = "", ...rest }) => {
                     <div className="flex flex-col space-y-4">
                         <TextHeader className="text-2xl text-accent">The Art of Film Commission</TextHeader>
                         <Paragraph>
-                            A 6% commission is payable on all items that are sold via our Site.&nbsp; Commission is
+                            A{" "}
+                            <span className="text-xl text-accent">
+                                {settings?.commission_percentage_on_sold_posters || 6}%
+                            </span>{" "}
+                            commission is payable on all items that are sold via our Site.&nbsp; Commission is
                             automatically deducted on completion of a sale.&nbsp; We do not take commission on postage
                             and shipping costs.&nbsp;
                         </Paragraph>

@@ -16,7 +16,7 @@ const SubStatusBadge: FC<SubStatusBadgeProps> = ({ className = "", sub, showTria
     return (
         <Paragraph
             {...rest}
-            className={classNames("text-sm capitalize line-clamp-1 py-0.5 px-2  rounded  tracking-wide font-bold", {
+            className={classNames("text-sm capitalize py-0.5 px-2 rounded tracking-wider font-bold", {
                 "bg-green-500/20 text-green-500": sub.status === SubscriptionStatus.ACTIVE,
                 "bg-blue-500/20 text-blue-500": sub.status === SubscriptionStatus.TRIALING,
                 "bg-slate-500/20 text-slate-500": sub.status === SubscriptionStatus.CANCELED,

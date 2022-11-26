@@ -10,6 +10,10 @@ import Chat from "../models/chatModel.js";
 import Message from "../models/messageModal.js";
 import Socket from "../models/socketModal.js";
 import getStripe from "../helpers/get-stripe.js";
+import getSettings from "../helpers/getSettings.js";
+import UserStripeInfo from "../models/userStripeInfoModal.js";
+import get_or_create_stripe_customer from "../helpers/get-or-create-stripe-customer.js";
+import PaymentRecord from "../models/paymentRecordModal.js";
 
 const orderRouter = express.Router();
 
@@ -153,11 +157,11 @@ orderRouter.post(
             if (order.seller._id.toString() !== user._id.toString())
                 return res.status(401).json({ message: "Unauthorized" });
             if (order.isDelivered) return res.status(401).json({ message: "Order is Already Delivered" });
-            if (order.isReceived) return res.status(401).json({ message: "Order Recieved" });
+            if (order.isRecieved) return res.status(401).json({ message: "Order Recieved" });
             if (order.haveIssue) return res.status(401).json({ message: "There's an issue" });
 
             order.isDelivered = true;
-            order.deliveredAt = Date.now();
+            order.deliveredAt = new Date().getTime();
             const savedOrder = await order.save();
 
             const chat = await Chat.findById(order.chatId).populate("messages");
@@ -217,17 +221,19 @@ orderRouter.post(
                 return res
                     .status(401)
                     .json({ message: "You can't mark order as recieved, wait for seller to deliver it" });
-            if (order.isReceived) return res.status(401).json({ message: "Order Already Recieved" });
+            if (order.isRecieved) return res.status(401).json({ message: "Order Already Recieved" });
             if (order.haveIssue) return res.status(401).json({ message: "There's an issue" });
 
-            order.isReceived = true;
-            order.recievedAt = Date.now();
+            order.isRecieved = true;
+            order.recievedAt = new Date().getTime();
             const savedOrder = await order.save();
 
             const seller = await User.findById(order.seller._id);
             if (seller) {
-                seller.pendingBalance -= savedOrder.totalPrice;
-                seller.availableBalance += savedOrder.totalPrice;
+                // FIXME:
+                const price_after_commission = (savedOrder.totalPrice * (100 - savedOrder.commission_percentage)) / 100;
+                seller.pendingBalance -= price_after_commission;
+                seller.availableBalance += price_after_commission;
                 await seller.save();
             }
 
@@ -280,10 +286,10 @@ orderRouter.post(
         try {
             const { socketId, orderId } = req.body;
 
-            const order = await Order.findById(orderId);
+            const order = await Order.findById(orderId).populate("seller").populate("user");
             if (!order) return res.status(404).json({ message: "Order not found" });
             if (order.orderItems.length === 0) return res.status(401).json({ message: "Order Empty" });
-            if (order.user.toString() !== req.user._id.toString())
+            if (order.user._id.toString() !== req.user._id.toString())
                 return res.status(401).json({ message: "Unauthorized" });
 
             let product_data = { name: "" };
@@ -311,6 +317,8 @@ orderRouter.post(
 
             const stripe = await getStripe();
 
+            const customer = await get_or_create_stripe_customer(req.user);
+
             const session = await stripe.checkout.sessions.create({
                 line_items: [
                     {
@@ -329,20 +337,41 @@ orderRouter.post(
                         socketId,
                     },
                 },
+                customer: customer.id,
                 success_url: `${process.env.STRIPE_SUCCESS_URL ?? "http://localhost:3000/payment/success"}`,
                 cancel_url: `${process.env.STRIPE_SUCCESS_URL ?? "http://localhost:3000/payment/canceled"}`,
             });
 
             await Session.deleteMany({ ref: orderId, status: "unpaid" });
-
             const new_session = new Session({
                 id: session.id,
                 url: session.url,
                 type: "poster",
-                period: "year",
                 ref: order._id.toString(),
                 status: session.payment_status,
+                user: order.user,
             });
+
+            const { commission_percentage_on_sold_posters } = await getSettings();
+
+            const total_commission_fee = (order.totalPrice * commission_percentage_on_sold_posters) / 100;
+
+            await PaymentRecord.deleteMany({ ref: orderId, status: "pending", collected: false });
+            const orderPayment = await new PaymentRecord({
+                by: order.user,
+                to: order.seller,
+                total_collected_amount: order.totalPrice,
+                commission_percentage: commission_percentage_on_sold_posters,
+                total_commission_fee,
+                total_release_amount_after_fee: order.totalPrice - total_commission_fee,
+                session: new_session._id,
+                type: "order",
+                ref: order._id.toString(),
+            }).save();
+
+            order.payment_record = advertisePayment._id;
+            await order.save();
+            new_session.payment_record = orderPayment._id;
 
             return res.status(200).json(await new_session.save());
         } catch (error) {
@@ -351,5 +380,39 @@ orderRouter.post(
         }
     })
 );
+
+export const autoReleaseOrders = async () => {
+    try {
+        const now_time = new Date().getTime();
+        const { auto_release_orders_time } = await getSettings();
+
+        const period = now_time - auto_release_orders_time;
+
+        const orders = await Order.find({
+            haveIssue: false,
+            deliveredAt: { $lte: period },
+            paidAt: { $lte: period },
+            isPaid: true,
+            isRecieved: false,
+            isDelivered: true,
+        });
+
+        for (const order of orders) {
+            order.isRecieved = true;
+            order.recievedAt = now_time;
+            const savedOrder = await order.save();
+
+            const seller = await User.findById(savedOrder.seller);
+            if (seller) {
+                seller.pendingBalance -= order.totalPrice;
+                seller.availableBalance += order.totalPrice;
+
+                await seller.save();
+            }
+        }
+    } catch (error) {}
+};
+
+setInterval(autoReleaseOrders, 1 * 1000);
 
 export default orderRouter;

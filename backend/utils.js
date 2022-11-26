@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import mg from "mailgun-js";
 import getStripe from "./helpers/get-stripe.js";
+import get_or_create_user_stripe_info from "./helpers/get_or_create_user_stripe_info.js";
 import { isObject } from "./helpers/isObject.js";
 import Gift from "./models/giftModal.js";
 import SubscriptionGift from "./models/SubscriptionGift.js";
@@ -20,6 +21,8 @@ export const generateToken = (id) => {
 };
 
 export const getUser = async (access_token) => {
+    if (!access_token) return undefined;
+
     let user;
 
     await new Promise((resolve) => {
@@ -51,7 +54,14 @@ export const isAuth = async (req, res, next) => {
 };
 
 export const getGiftSub = async (user) => {
-    const giftSub = await SubscriptionGift.findOne({ user: user._id, active: true }).populate("gift");
+    const giftSub = await SubscriptionGift.findOne({ user: user._id, active: true })
+        .populate({
+            path: "gift",
+            populate: {
+                path: "buyer",
+            },
+        })
+        .populate("targeted_sub");
     if (!giftSub) return null;
 
     return giftSub;
@@ -73,15 +83,14 @@ export const giftSubValid = async (giftSub) => {
 };
 
 export const getStripeSubscription = async (user) => {
-    const useStripeInfo = await UserStripeInfo.findOne({ user: user._id });
-    if (!useStripeInfo) return res.status(401).json(errorRes);
+    const userStripeInfo = await get_or_create_user_stripe_info(user);
 
     const stripe = await getStripe();
 
     let sub;
 
     try {
-        sub = await stripe.subscriptions.retrieve(useStripeInfo.sub);
+        sub = await stripe.subscriptions.retrieve(userStripeInfo.sub);
     } catch (error) {
         return null;
     }

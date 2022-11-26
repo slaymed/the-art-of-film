@@ -35,7 +35,7 @@ export interface IOrder extends TimeStamp {
     paidAt: string;
     isDelivered: boolean;
     deliveredAt: string;
-    isReceived: boolean;
+    isRecieved: boolean;
     recievedAt: string;
     allowToPay: boolean;
     chatId: string;

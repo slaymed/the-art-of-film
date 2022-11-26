@@ -13,6 +13,7 @@ import GiftCard from "../components/cards/GiftCard";
 import LoadingBox from "../components/kits/LoadingBox";
 
 import { useDispatch } from "../hooks/useDispatch";
+import ErrorWithRedirect from "../components/kits/ErrorWithRedirect";
 
 export interface GiftScreenProps extends ComponentProps<"div"> {}
 
@@ -32,14 +33,19 @@ const GiftScreen: FC<GiftScreenProps> = ({ className = "", ...rest }) => {
     };
 
     return (
-        <div {...rest} className={classNames("p-8 flex flex-col sm:p-16 bg-light-dark", { [className]: className })}>
+        <div
+            {...rest}
+            className={classNames("p-8 flex flex-col sm:p-16 gap-8 bg-light-dark", { [className]: className })}
+        >
             {!gift && !loading && (
                 <TextHeader className="bg-light-dark text-3xl">
                     <span className="text-accent">Gift</span> not found
                 </TextHeader>
             )}
 
-            {gift && (
+            {(loading || syncing.loading) && <LoadingBox />}
+
+            {!loading && !syncing.loading && gift && (
                 <div className="flex flex-col gap-8">
                     <div className="flex flex-wrap justify-between items-center">
                         <Paragraph className="bg-light-dark text-accent uppercase font-bold tracking-widest text-6xl">
@@ -55,10 +61,16 @@ const GiftScreen: FC<GiftScreenProps> = ({ className = "", ...rest }) => {
                         </div>
                     </div>
 
-                    {(loading || syncing.loading) && <LoadingBox />}
-
-                    {!loading && !syncing.loading && <GiftCard gift={gift} />}
+                    <GiftCard gift={gift} />
                 </div>
+            )}
+
+            {!loading && !syncing.loading && (
+                <Link to="/purchaced-gifts">
+                    <Paragraph className="text-accent text-sm tracking-wider underline underline-offset-2">
+                        See All Purchaced Gifts
+                    </Paragraph>
+                </Link>
             )}
         </div>
     );

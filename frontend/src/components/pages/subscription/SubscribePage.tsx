@@ -1,6 +1,6 @@
 import React, { FC, ComponentProps } from "react";
 import classNames from "classnames";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import Paragraph from "../../elements/Paragraph";
@@ -37,6 +37,17 @@ const SubscribePage: FC<SubscribePageProps> = ({ className = "", ...rest }) => {
             </Paragraph>
 
             <SubscriptionCard sub={sub} user={userInfo} />
+
+            <div className="flex items-center flex-wrap gap-3">
+                <Paragraph className="text-sm uppercase text-slate-400 tracking-widest font-bold">
+                    have a gift code?
+                </Paragraph>
+                <Link to="/redeem-gift-sub">
+                    <Paragraph className="text-sm uppercase tracking-wider underline underline-offset-2 text-accent">
+                        Redeem
+                    </Paragraph>
+                </Link>
+            </div>
 
             <ErrorWithRedirect loading={loading} errors={errors} />
         </div>

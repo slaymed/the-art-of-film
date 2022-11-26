@@ -31,7 +31,7 @@ const CreditCardsPage: FC<CreditCardsPageProps> = ({ className = "", ...rest }) 
             </div>
 
             {fetching.loading ? (
-                <LoadingBox className="mx-auto" />
+                <LoadingBox className="mx-auto sm:ml-0" />
             ) : (
                 <div className="w-full pb-2 overflow-x-auto scroll-bar">
                     {creditCards.length > 0 ? (

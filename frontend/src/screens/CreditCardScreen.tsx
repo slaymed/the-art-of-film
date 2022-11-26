@@ -16,6 +16,7 @@ import { CreditCardErrors, ICreditCard } from "../store/payment-methods/types";
 import { RequestLifeCycle } from "../store/enums";
 import OrderInfoPieceCard from "../components/cards/OrderInfoPieceCard";
 import OrderInfoSeperator from "../components/kits/OrderInfoSeperator";
+import Page from "../components/pages/Page";
 
 export interface CreditCardScreenProps extends ComponentProps<"div"> {}
 
@@ -40,9 +41,9 @@ const CreditCardScreen: FC<CreditCardScreenProps> = ({ className = "", ...rest }
 
     if (loading)
         return (
-            <div className="p-8 smp-16 flex justify-center items-center">
+            <Page>
                 <LoadingBox />
-            </div>
+            </Page>
         );
 
     if (!creditCard)
@@ -53,10 +54,7 @@ const CreditCardScreen: FC<CreditCardScreenProps> = ({ className = "", ...rest }
         );
 
     return (
-        <div
-            {...rest}
-            className={classNames("p-8 sm:p-16 bg-light-dark flex flex-col space-y-8", { [className]: className })}
-        >
+        <Page {...rest} className={classNames("", { [className]: className })}>
             <div className="flex justify-between items-center space-x-8">
                 <Paragraph className="uppercase text-3xl text-accent font-bold tracking-widest line-clamp-1">
                     Credit Card
@@ -133,7 +131,7 @@ const CreditCardScreen: FC<CreditCardScreenProps> = ({ className = "", ...rest }
                     )}
                 </div>
             )}
-        </div>
+        </Page>
     );
 };
 

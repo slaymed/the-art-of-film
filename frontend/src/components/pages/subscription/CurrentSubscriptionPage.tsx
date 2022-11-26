@@ -18,6 +18,8 @@ import ErrorWithRedirect from "../../kits/ErrorWithRedirect";
 import RefetchButton from "../../kits/RefetchButton";
 import NextSubPage from "./NextSubPage";
 import Paragraph from "../../elements/Paragraph";
+import SubscriptionColorText from "../../kits/SubscriptionColorText";
+import CurrentGiftSubPage from "./CurrentGiftSubPage";
 
 import { useDispatch } from "../../../hooks/useDispatch";
 
@@ -38,7 +40,7 @@ const CurrentSubscriptionPage: FC<CurrentSubscriptionPageProps> = ({ className =
 
     if (!sub) return null;
 
-    if (sub.giftSub) return <Paragraph>No Sub Lets Check for gift sub</Paragraph>;
+    if (sub.giftSub) return <CurrentGiftSubPage giftSub={sub.giftSub} />;
 
     return (
         <div {...rest} className={classNames("flex flex-col space-y-8", { [className]: className })}>
@@ -65,23 +67,25 @@ const CurrentSubscriptionPage: FC<CurrentSubscriptionPageProps> = ({ className =
                             </div>
                         </div>
                         <div className="flex flex-col space-y-1">
-                            <div className="flex space-x-2 items-center">
-                                <Paragraph className="text-lg font-bold tracking-wider text-slate-400 uppercase">
-                                    {sub.sub_data.sub.name}
-                                </Paragraph>
-                                <SubStatusBadge sub={sub.sub_data} />
+                            <div className="flex gap-2 items-center flex-wrap">
+                                <SubscriptionColorText
+                                    sub={sub.sub_data.sub}
+                                    text={sub.sub_data.sub.name}
+                                    className="text-lg font-bold tracking-wider text-slate-400 uppercase"
+                                />
+                                <SubStatusBadge sub={sub.sub_data} className="hidden sm:block" />
                                 <SubDateShow sub={sub.sub_data} />
                             </div>
-                            <div className="flex space-x-2 items-center text-slate-500">
-                                <Paragraph className="text-sm line-clamp-1">
+                            <div className="flex gap-2 items-center text-slate-500 flex-wrap">
+                                <Paragraph className="text-sm">
                                     Billing {sub.sub_data.billing === Period.MONETH && "Monthly"}
                                     {sub.sub_data.billing === Period.YEAR && "Yearly"}
                                 </Paragraph>
-                                <div className="w-1 h-1 rounded-full bg-slate-500" />
+                                <div className="w-1 h-1 rounded-full bg-slate-500 hidden sm:block" />
                                 {sub.sub_data.cancel_at_period_end ? (
-                                    <Paragraph className="text-sm line-clamp-1">No Future Invoices</Paragraph>
+                                    <Paragraph className="text-sm hidden sm:block">No Future Invoices</Paragraph>
                                 ) : (
-                                    <Paragraph className="text-sm line-clamp-1">
+                                    <Paragraph className="text-sm hidden sm:block">
                                         Next invoice on{" "}
                                         {dayjs(sub.sub_data.current_period_end * 1000).format("MMM D, YYYY")} for{" "}
                                         <CurrencyConvert amount={sub.sub_data.price} />

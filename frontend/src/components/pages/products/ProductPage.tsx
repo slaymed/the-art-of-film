@@ -1,6 +1,6 @@
 import React, { FC, ComponentProps, useState, useEffect } from "react";
 import classNames from "classnames";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import TextHeader from "../../elements/TextHeader";
@@ -29,10 +29,12 @@ const ProductPage: FC<ProductPageProps> = ({ className = "", product, reverse, .
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    const { sellerId } = useParams();
+
     const adding = useSelector(addingToCart);
     const userInfo = useSelector(user);
 
-    const [images] = useState([product.image, ...product.images]);
+    const [images, setImages] = useState([product.image, ...product.images]);
     const [selectedImage, setSelectedImage] = useState(product.image);
 
     const add = async () => {
@@ -45,6 +47,7 @@ const ProductPage: FC<ProductPageProps> = ({ className = "", product, reverse, .
 
     useEffect(() => {
         setSelectedImage(product.image);
+        setImages([product.image, ...product.images]);
     }, [product]);
 
     return (
@@ -58,7 +61,7 @@ const ProductPage: FC<ProductPageProps> = ({ className = "", product, reverse, .
         >
             {images.length > 0 && (
                 <div className="flex-1 flex h-full flex-col justify-between gap-4">
-                    <div className="w-full border border-dashed border-accent">
+                    <div className="w-full border border-accent">
                         <img src={selectedImage} alt="Posetr Banner" className="w-full max-h-[700px] object-contain" />
                     </div>
                     <div className="h-[120px] w-full flex scroll-bar gap-4 overflow-x-auto">
@@ -68,11 +71,7 @@ const ProductPage: FC<ProductPageProps> = ({ className = "", product, reverse, .
                                 className="h-full flex-shrink-0 cursor-pointer"
                                 onClick={() => setSelectedImage(image)}
                             >
-                                <img
-                                    src={image}
-                                    className="bg-cover border border-dashed border-accent h-full"
-                                    alt="Poster Small Banner"
-                                />
+                                <img src={image} className="bg-cover h-full" alt="Poster Small Banner" />
                             </div>
                         ))}
                     </div>
@@ -83,6 +82,27 @@ const ProductPage: FC<ProductPageProps> = ({ className = "", product, reverse, .
                     <TextHeader className="text-4xl break-all sm:text-6xl text-accent lg:text-4xl xl:text-6xl line-clamp-1 hover:line-clamp-none">
                         {product.name}
                     </TextHeader>
+
+                    {sellerId !== product.seller._id && (
+                        <div className="flex flex-wrap items-center gap-4 justify-between">
+                            <div className="flex flex-wrap items-center gap-4">
+                                <Paragraph className="text-slate-400 uppercase font-bold tracking-widest">
+                                    Poster For Sale From
+                                </Paragraph>
+                                <Link to={`/seller/${product.seller._id}`}>
+                                    <Paragraph className="uppercase underline text-accent font-bold tracking-widest underline-offset-2">
+                                        {product.seller.name}
+                                    </Paragraph>
+                                </Link>
+                            </div>
+                            <Link to={`/seller/${product.seller._id}`}>
+                                <Paragraph className="uppercase underline text-accent font-bold tracking-widest underline-offset-2">
+                                    visite showcase
+                                </Paragraph>
+                            </Link>
+                        </div>
+                    )}
+
                     <div className="flex flex-col gap-4">
                         {product.directors.length > 0 && (
                             <div className="flex gap-4 justify-between w-full">

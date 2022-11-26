@@ -98,7 +98,7 @@ const PurchacedGiftsScreen: FC<PurchacedGiftsScreenProps> = ({ className = "", .
                         )}
                         onClick={() => setUsp({ filter: Filters.NOT_USED })}
                     >
-                        <Paragraph>Not Used Gifts</Paragraph>
+                        <Paragraph>Unused Gifts</Paragraph>
                     </Tab>
                     <Tab
                         className={classNames(

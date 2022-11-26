@@ -79,7 +79,7 @@ const ChatOrderSection: FC<ChatOrderSectionProps> = ({ className = "", ...rest }
                             </Paragraph>
                         </Link>
                     )}
-                    {order.isPaid && !order.haveIssue && !order.isReceived && (
+                    {order.isPaid && !order.haveIssue && !order.isRecieved && (
                         <Link className="w-fit" to={`/raise-an-issue/${order._id}`}>
                             <Paragraph className="text-accent underline text-sm font-bold underline-offset-2 tracking-wider">
                                 Raise an Issue

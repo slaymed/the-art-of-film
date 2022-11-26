@@ -7,5 +7,5 @@ export enum SessionStatus {
 export enum SessionType {
     GIFT = "gift",
     POSTER = "poster",
-    ADVERTISMENT = "advertisement",
+    ADVERTISEMENT = "advertisement",
 }

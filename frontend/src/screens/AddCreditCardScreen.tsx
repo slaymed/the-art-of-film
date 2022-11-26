@@ -19,6 +19,7 @@ import { addCreditCard } from "../store/payment-methods/thunks";
 import { ThunkResponseType } from "../store/types";
 import { RequestLifeCycle } from "../store/enums";
 import { user } from "../store/auth/selectors";
+import Page from "../components/pages/Page";
 
 const addressInitialState: PaymentMethodAddress = {
     city: "",
@@ -143,10 +144,7 @@ const AddCreditCardScreen: FC<AddCreditCardScreenProps> = ({ className = "", ...
     };
 
     return (
-        <div
-            {...rest}
-            className={classNames("flex flex-col space-y-8 p-8 sm:p-16 bg-light-dark", { [className]: className })}
-        >
+        <Page {...rest} className={classNames("", { [className]: className })}>
             <form className="form flex flex-col space-y-6 max-w-2xl mx-auto w-full" onSubmit={handleSubmit}>
                 <Paragraph className="text-xl uppercase sm:text-3xl text-accent tracking-wider font-bold">
                     Add New Credit Card
@@ -437,7 +435,7 @@ const AddCreditCardScreen: FC<AddCreditCardScreenProps> = ({ className = "", ...
                     <Paragraph className="font-bold">Add Credit Card</Paragraph>
                 </Button>
             </form>
-        </div>
+        </Page>
     );
 };
 

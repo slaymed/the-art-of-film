@@ -44,8 +44,13 @@ const slice = createSlice({
                 gifts[updateKey].errors = globalMessage;
                 gifts[updateKey].loading = false;
             });
-            addCase(thunk.rejected, (gifts, { payload }) => {
+            addCase(thunk.rejected, (gifts, { payload, meta: { arg } }) => {
                 const { errors } = payload as ThunkResponseType<IGift, GlobalMessage>;
+
+                if (typeof arg === "string") {
+                    const index = gifts.list.findIndex((g) => g._id === arg);
+                    if (indexFound(index)) gifts.list.splice(index, 1);
+                }
 
                 if (errors) gifts[updateKey].errors = errors;
                 gifts[updateKey].loading = false;

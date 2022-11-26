@@ -14,6 +14,7 @@ import { RequestLifeCycle } from "./store/enums";
 import { fetchAuthenticatedUser } from "./store/auth/thunks";
 import { fetchAvailableSubscriptions } from "./store/subscription/thunks";
 import { fetchRates } from "./store/currency/thunks";
+import { fetchWebsiteSettings } from "./store/settings/thunks";
 
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -26,7 +27,6 @@ import RegisterScreen from "./screens/RegisterScreen";
 import SigninScreen from "./screens/SigninScreen";
 import ResetPasswordScreen from "./screens/ResetPasswordScreen";
 import AdvertiseListScreen from "./screens/AdvertiseListScreen";
-import AdvertiseScreen from "./screens/AdvertiseScreen";
 import SessionHandleScreen from "./screens/SessionHandleScreen";
 import ShippingAddressScreen from "./screens/ShippingAddressScreen";
 import PlaceOrderScreen from "./screens/PlaceOrderScreen";
@@ -69,6 +69,13 @@ import BuyGiftSubScreen from "./screens/BuyGiftSubScreen";
 import PurchacedGiftsScreen from "./screens/PurchacedGiftsScreen";
 import GiftScreen from "./screens/GiftScreen";
 import RedeemGiftSubScreen from "./screens/RedeemGiftSubScreen";
+import CreateAdvertiseScreen from "./screens/CreateAdvertiseScreen";
+import EditAdvertiseScreen from "./screens/EditAdvertiseScreen";
+import { fetchAdvertisement } from "./store/advertisements/thunk";
+import AdvertisementScreen from "./screens/AdvertisementScreen";
+import AdvertisementTransactionScreen from "./screens/AdvertisementTransactionScreen";
+import AdvertorialScreen from "./screens/AdvertorialScreen";
+import FindYourAdvertisementScreen from "./screens/FindYourAdvertisementScreen";
 
 dayjs.extend(relativeTime);
 
@@ -78,6 +85,8 @@ function App() {
     const dispatch = useDispatch();
 
     const load = useCallback(async () => {
+        dispatch(fetchAdvertisement());
+        dispatch(fetchWebsiteSettings());
         dispatch(fetchRates());
         dispatch(fetchAvailableSubscriptions());
 
@@ -101,9 +110,17 @@ function App() {
                 <main>
                     <Routes>
                         <Route path="/" element={<HomeScreen />} />
-                        <Route path="/advertisments" element={<AdvertiseListScreen />}></Route>
-                        <Route path="/advertise" element={<AdvertiseScreen />}></Route>
-                        <Route path="/advertise-with-us" element={<AdvertiseWithUs />}></Route>
+                        <Route path="/advertisements" element={<AdvertiseListScreen />} />
+                        <Route path="/create-advertisement" element={<CreateAdvertiseScreen />} />
+                        <Route path="/advertisement/:advertisementId" element={<AdvertisementScreen />} />
+                        <Route path="/find-your-advertisement" element={<FindYourAdvertisementScreen />} />
+                        <Route path="/advertorial/:advertisementId" element={<AdvertorialScreen />} />
+                        <Route
+                            path="/advertisement-transaction/:advertisementId"
+                            element={<AdvertisementTransactionScreen />}
+                        />
+                        <Route path="/edit-advertisement/:advertisementId" element={<EditAdvertiseScreen />} />
+                        <Route path="/advertise-with-us" element={<AdvertiseWithUs />} />
                         <Route path="/register" element={<RegisterScreen />} />
                         <Route path="/signin" element={<SigninScreen />} />
                         <Route

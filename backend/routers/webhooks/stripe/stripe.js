@@ -38,8 +38,10 @@ stripeWebhooksRouter.post(
                     break;
                 case "charge.refunded":
                     data = await chargeRefunded(event, io);
+                    break;
                 case "customer.subscription.deleted":
                     data = await customerSubscriptionDeleted(event, io);
+                    break;
                 default:
                     return res.status(400).json({ success: false, message: "Event Not Supported Yet!" });
             }

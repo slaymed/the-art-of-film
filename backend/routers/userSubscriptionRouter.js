@@ -1,8 +1,11 @@
 import express from "express";
 import expressAsyncHandler from "express-async-handler";
+import get_or_create_stripe_customer from "../helpers/get-or-create-stripe-customer.js";
 
 import getStripe from "../helpers/get-stripe.js";
+import get_or_create_user_stripe_info from "../helpers/get_or_create_user_stripe_info.js";
 import { isObject } from "../helpers/isObject.js";
+import { mapGiftSub } from "../helpers/map-gift-sub.js";
 import { mapSubscription } from "../helpers/map-subscription.js";
 import { toFixed } from "../helpers/toFixed.js";
 import Subscription from "../models/subscriptionModel.js";
@@ -26,7 +29,7 @@ userSubscriptionRouter.get(
             if (!subscribed) return res.status(404).json(resMsg);
 
             const giftSub = await getGiftSub(req.user);
-            if (await giftSubValid(giftSub)) return res.status(200).json({ giftSub });
+            if (await giftSubValid(giftSub)) return res.status(200).json(mapGiftSub(giftSub));
 
             const stripeSub = await getStripeSubscription(req.user);
             if (stripeSubValid(stripeSub)) return res.status(200).json(await mapSubscription(stripeSub));
@@ -48,9 +51,10 @@ userSubscriptionRouter.post(
 
             const giftSub = await getGiftSub(user);
             if (await giftSubValid(giftSub))
-                return res
-                    .status(401)
-                    .json({ message: "You have a valid subscription gift!", redirect: "/page/subscriptions" });
+                return res.status(401).json({
+                    message: "You Already have a valid subscription, Enjoy your Gift",
+                    redirect: "/my-subscription",
+                });
 
             const { subscriptionId, charge_period = "month" } = req.body;
 
@@ -59,13 +63,10 @@ userSubscriptionRouter.post(
             const targetedSub = await Subscription.findById(subscriptionId);
             if (!targetedSub) return res.status(404).json({ message: "Subscription not found" });
 
-            let userStripeInfo = await UserStripeInfo.findOne({ user: user._id });
-            if (!userStripeInfo)
-                return res
-                    .status(500)
-                    .json({ message: "Can't create a subscription at the moment, please try again later" });
-
             const stripe = await getStripe();
+
+            const userStripeInfo = await get_or_create_user_stripe_info(user);
+            const customer = await get_or_create_stripe_customer(user);
 
             const stripe_monthly_price = await stripe.prices.retrieve(targetedSub.monthly_stripe_data.price_id);
             const stripe_yearly_price = await stripe.prices.retrieve(targetedSub.yearly_stripe_data.price_id);
@@ -73,7 +74,7 @@ userSubscriptionRouter.post(
 
             if (!user.trialUsed) {
                 const subscription = await stripe.subscriptions.create({
-                    customer: userStripeInfo.customer,
+                    customer: customer.id,
                     items: [{ price: targeted_price.id }],
                     trial_period_days: 30,
                     metadata: {
@@ -96,25 +97,6 @@ userSubscriptionRouter.post(
                 try {
                     current_sub = await stripe.subscriptions.retrieve(userStripeInfo.sub);
                 } catch (error) {}
-            }
-
-            let customer;
-            try {
-                customer = await stripe.customers.retrieve(userStripeInfo.customer);
-                if (customer.deleted) {
-                    customer = await stripe.customers.create({
-                        name: user.name,
-                        email: user.email,
-                        metadata: {
-                            userId: user._id,
-                        },
-                        test_clock: test_clock.id,
-                    });
-                    userStripeInfo.customer = customer.id;
-                    userStripeInfo = await userStripeInfo.save();
-                }
-            } catch (error) {
-                console.log(error);
             }
 
             if (!customer.invoice_settings.default_payment_method)
@@ -179,7 +161,7 @@ userSubscriptionRouter.post(
                 });
 
                 const subscription = await stripe.subscriptions.create({
-                    customer: userStripeInfo.customer,
+                    customer: customer.id,
                     items: [{ price: targeted_price.id }],
                     coupon: newCoupon.id,
                     metadata: {
@@ -202,7 +184,7 @@ userSubscriptionRouter.post(
             }
 
             const subscription = await stripe.subscriptions.create({
-                customer: userStripeInfo.customer,
+                customer: customer.id,
                 items: [{ price: targeted_price.id }],
                 metadata: {
                     current_sub_id: targetedSub._id.toString(),

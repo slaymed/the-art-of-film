@@ -1,8 +1,11 @@
 import express from "express";
 import expressAsyncHandler from "express-async-handler";
+import get_or_create_stripe_customer from "../helpers/get-or-create-stripe-customer.js";
 
 import getStripe from "../helpers/get-stripe.js";
+import getSettings from "../helpers/getSettings.js";
 import Gift from "../models/giftModal.js";
+import PaymentRecord from "../models/paymentRecordModal.js";
 import Session from "../models/sessionModel.js";
 import Subscription from "../models/subscriptionModel.js";
 import { isAuth } from "../utils.js";
@@ -63,6 +66,7 @@ giftsRouter.post(
 
             return res.status(201).json(await gift.save());
         } catch (error) {
+            console.log(error);
             return res.status(500).json(error);
         }
     })
@@ -75,7 +79,7 @@ giftsRouter.post(
         try {
             const { socketId, giftId } = req.body;
 
-            const gift = await Gift.findById(giftId);
+            const gift = await Gift.findById(giftId).populate("buyer");
             if (!gift) return res.status(404).json({ message: "Subscription Gift not found" });
 
             const targeted_sub = await Subscription.findById(gift.targeted_ref_id);
@@ -88,6 +92,8 @@ giftsRouter.post(
             };
 
             const price = gift.period === "year" ? targeted_sub.yearPrice : targeted_sub.monthPrice;
+
+            const customer = await get_or_create_stripe_customer(req.user);
 
             const session = await stripe.checkout.sessions.create({
                 line_items: [
@@ -107,12 +113,12 @@ giftsRouter.post(
                         socketId,
                     },
                 },
+                customer: customer.id,
                 success_url: `${process.env.STRIPE_SUCCESS_URL ?? "http://localhost:3000/payment/success"}`,
                 cancel_url: `${process.env.STRIPE_SUCCESS_URL ?? "http://localhost:3000/payment/canceled"}`,
             });
 
             await Session.deleteMany({ ref: giftId, status: "unpaid" });
-
             const new_session = new Session({
                 id: session.id,
                 url: session.url,
@@ -120,7 +126,24 @@ giftsRouter.post(
                 period: gift.period,
                 ref: gift._id.toString(),
                 status: session.payment_status,
+                user: gift.buyer,
             });
+
+            await PaymentRecord.deleteMany({ ref: gift._id.toString(), status: "pending", collected: false });
+            const giftPayment = await new PaymentRecord({
+                by: gift.buyer,
+                total_collected_amount: price,
+                commission_percentage: 0,
+                total_commission_fee: 0,
+                total_release_amount_after_fee: price,
+                session: new_session._id,
+                type: "gift",
+                ref: gift._id.toString(),
+            }).save();
+
+            gift.payment_record = advertisePayment._id;
+            await gift.save();
+            new_session.payment_record = giftPayment._id;
 
             return res.status(200).json(await new_session.save());
         } catch (error) {

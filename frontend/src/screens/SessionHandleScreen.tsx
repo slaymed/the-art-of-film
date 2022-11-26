@@ -21,6 +21,7 @@ import { fetchMyGifts, syncGift } from "../store/gifts/thunks";
 import { fetchChatListObject, fetchOrderChat } from "../store/chat/thnuks";
 
 import { socket } from "../App";
+import { syncAdvertise } from "../store/advertisements/thunk";
 
 export interface SessionHandleScreenProps extends ComponentProps<"div"> {}
 
@@ -42,7 +43,7 @@ const SessionHandleScreen: FC<SessionHandleScreenProps> = ({ className = "", ...
         if (status !== RequestLifeCycle.SUCCESS) return;
 
         switch (clone.type) {
-            case SessionType.ADVERTISMENT:
+            case SessionType.ADVERTISEMENT:
                 break;
             case SessionType.POSTER:
                 window.location.href = "/shop";
@@ -61,7 +62,9 @@ const SessionHandleScreen: FC<SessionHandleScreenProps> = ({ className = "", ...
             dispatch(updateStripeProp({ currentSession: session }));
 
             switch (session.type) {
-                case SessionType.ADVERTISMENT:
+                case SessionType.ADVERTISEMENT:
+                    dispatch(syncAdvertise(session.ref));
+                    navigate(`/advertisement/${session.ref}`);
                     break;
                 case SessionType.POSTER:
                     dispatch(syncOrder(session.ref));
@@ -89,7 +92,7 @@ const SessionHandleScreen: FC<SessionHandleScreenProps> = ({ className = "", ...
             dispatch(updateStripeProp({ currentSession: session }));
 
             switch (session.type) {
-                case SessionType.ADVERTISMENT:
+                case SessionType.ADVERTISEMENT:
                     break;
                 case SessionType.POSTER:
                     dispatch(fetchOrders());

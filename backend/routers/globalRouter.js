@@ -7,6 +7,8 @@ import Setting from "../models/settingModel.js";
 import Advertise from "../models/advertiseModel.js";
 import Order from "../models/orderModel.js";
 import Gift from "../models/giftModal.js";
+import PaymentRecord from "../models/paymentRecordModal.js";
+import { getUser } from "../utils.js";
 
 const globalRouter = express.Router();
 
@@ -16,10 +18,12 @@ globalRouter.post(
         try {
             const { sessionId } = req.body;
 
+            const user = await getUser(req.cookies.access_token);
+
             const session = await Session.findOne({ id: sessionId });
             if (!session) return res.status(404).json({ message: "Checkout session not found" });
 
-            if (session.user && session.user.toString() !== req.user._id.toString())
+            if (session.user && user && session.user.toString() !== user._id.toString())
                 return res.status(401).json({ message: "Unauthorized" });
 
             if (session.status === "paid")
@@ -47,14 +51,18 @@ globalRouter.post(
                 case "gift":
                     const gift = await Gift.findById(session.ref);
                     if (gift) await gift.remove();
+                    break;
                 default:
                     return res.status(401).json({ message: `Removing ${session.type} is not supported yet` });
             }
 
+            const payment_record = await PaymentRecord.findById(session.payment_record);
+            if (payment_record) await payment_record.remove();
             await session.remove();
 
             return res.status(200).json(null);
         } catch (error) {
+            console.log(error);
             return res.status(500).json(error);
         }
     })

@@ -57,15 +57,14 @@ issueRouter.post(
                     .status(401)
                     .json({ message: "Order Already has unsolved issue", redirect: `/issues/${order._id.toString()}` });
             if (!order.isPaid) return res.status(401).json({ message: "Order not paid yet" });
-            if (order.isReceived)
+            if (order.isRecieved)
                 return res.status(401).json({ message: "Can't raise an issue with a recieved order" });
 
-            const createdAt_time = order.paidAt.getTime();
             const now_time = new Date().getTime();
             const day_time = 1000 * 60 * 60 * 24;
             const period_time = day_time * 3;
 
-            const gone_period = now_time - createdAt_time;
+            const gone_period = now_time - order.paidAt;
 
             if (gone_period < period_time) return res.status(401).json({ message: "Raising an issue not allowed yet" });
 
@@ -140,13 +139,11 @@ issueRouter.post(
             if (!order) return res.status(404).json({ message: "Issue Order Not Found" });
 
             issue.solved = true;
-            issue.solvedAt = Date.now();
-
+            issue.solvedAt = new Date().getTime();
             await issue.save();
 
             order.issueId = null;
             order.haveIssue = false;
-
             const savedOrder = await order.save();
 
             const chat = await Chat.findById(savedOrder.chatId);
@@ -157,11 +154,9 @@ issueRouter.post(
                 chatId: chat._id,
                 isStatus: true,
             });
-
             const savedMessage = await message.save();
 
             chat.messages.push(message);
-
             await chat.save();
 
             for (const socket of await Socket.find({ user: order.user._id })) {

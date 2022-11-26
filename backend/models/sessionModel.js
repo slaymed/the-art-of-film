@@ -10,7 +10,6 @@ const sessionSchema = new mongoose.Schema(
             enum: ["gift", "poster", "advertisement"],
         },
         ref: { type: mongoose.Schema.Types.ObjectId },
-        period: { type: String, enum: ["month", "year"] },
         status: { type: String, required: true, enum: ["unpaid", "paid", "refunded"] },
         payment_intent_id: { type: String },
         lifeCycle: {
@@ -22,10 +21,20 @@ const sessionSchema = new mongoose.Schema(
             default: null,
         },
         user: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
+        payment_record: { type: mongoose.Schema.Types.ObjectId, ref: "PaymentRecord" },
     },
     {
         timestamps: true,
     }
 );
 const Session = mongoose.model("Session", sessionSchema);
+
+sessionSchema.set("toJSON", {
+    transform: (doc, session, options) => {
+        delete session.payment_intent_id;
+
+        return session;
+    },
+});
+
 export default Session;

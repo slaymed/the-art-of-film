@@ -1,4 +1,4 @@
-import React, { FC, ComponentProps, useEffect, useState, useCallback, ChangeEvent, FormEvent } from "react";
+import React, { FC, ComponentProps, useEffect, useState, useCallback, ChangeEvent, FormEvent, useRef } from "react";
 import classNames from "classnames";
 import CreatableSelect from "react-select/creatable";
 import makeAnimated from "react-select/animated";
@@ -17,7 +17,7 @@ import { uploadOperation } from "../../store/upload/selectors";
 import { artistesSelector, castsSelector, directorsSelector } from "../../store/tags/selectors";
 import { RequestLifeCycle } from "../../store/enums";
 
-import data from "../../data";
+import data, { yearOptions } from "../../data";
 
 import { useDispatch } from "../../hooks/useDispatch";
 
@@ -30,6 +30,7 @@ import AppSwitch from "../elements/AppSwitch";
 import CurrencyInput from "../elements/CurrencyInput";
 import Button from "../elements/Button";
 import H1 from "../elements/H1";
+import ImagePreviewCard from "../cards/ImagePreviewCard";
 
 const animate = makeAnimated();
 
@@ -65,8 +66,12 @@ const CreateEditPosterForm: FC<CreateEditPosterFormProps> = ({
     const [vars, setVars] = useState(initialState);
     const [multipleUploadInProgress, setMultipleUploadInProgress] = useState(false);
 
+    const imageInputRef = useRef<HTMLInputElement>(null);
+    const imagesInputRef = useRef<HTMLInputElement>(null);
+
     const handleUpload = useCallback(
         async (event: ChangeEvent<HTMLInputElement>) => {
+            if (!imageInputRef.current) return;
             if (!event.target.files || event.target.files.length === 0) return;
 
             const file = event.target.files[0];
@@ -76,12 +81,14 @@ const CreateEditPosterForm: FC<CreateEditPosterFormProps> = ({
             const { data: image } = res.payload as ThunkResponseType<UploadResponse, GlobalMessage>;
 
             if (image) setVars((prev) => ({ ...prev, image: image.secure_url }));
+            imageInputRef.current.value = "";
         },
         [dispatch]
     );
 
     const uploadMultipleFiles = useCallback(
         async (event: ChangeEvent<HTMLInputElement>) => {
+            if (!imagesInputRef.current) return;
             if (!event.target.files || event.target.files.length === 0) return;
 
             setMultipleUploadInProgress(true);
@@ -93,6 +100,7 @@ const CreateEditPosterForm: FC<CreateEditPosterFormProps> = ({
                 if (image) setVars((prev) => ({ ...prev, images: [...prev.images, image.secure_url] }));
             }
             setMultipleUploadInProgress(false);
+            imagesInputRef.current.value = "";
         },
         [dispatch]
     );
@@ -103,6 +111,12 @@ const CreateEditPosterForm: FC<CreateEditPosterFormProps> = ({
 
     const handleTagsChange = async (multiValue: MultiValue<TagOption>, ref: string) => {
         setVars((prev) => ({ ...prev, [ref]: multiValue.map(({ label }) => label) }));
+    };
+
+    const removeAdditionalImage = (index: number) => {
+        const clone = [...vars.images];
+        clone.splice(index, 1);
+        setVars((prev) => ({ ...prev, images: clone }));
     };
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -154,7 +168,8 @@ const CreateEditPosterForm: FC<CreateEditPosterFormProps> = ({
                 <div className="flex flex-col space-y-1">
                     <label htmlFor="poster_image">Upload Poster Image</label>
                     <div className="relative">
-                        <AppInput
+                        <input
+                            ref={imageInputRef}
                             id="poster_image"
                             type="file"
                             placeholder="Upload Poster Image"
@@ -183,9 +198,12 @@ const CreateEditPosterForm: FC<CreateEditPosterFormProps> = ({
                 </div>
 
                 {vars.image && (
-                    <div className="w-full max-w-[160px] border border-accent border-dashed">
-                        <img src={vars.image} className="w-full max-h-[120px] object-contain" />
-                    </div>
+                    <ImagePreviewCard
+                        image={vars.image}
+                        className="max-w-[160px]"
+                        imageClasses="max-h-[120px]"
+                        onDelete={() => setVars((prev) => ({ ...prev, image: "" }))}
+                    />
                 )}
             </div>
 
@@ -194,7 +212,8 @@ const CreateEditPosterForm: FC<CreateEditPosterFormProps> = ({
                 <div className="flex flex-col space-y-1">
                     <label htmlFor="poster_images">Upload Additional Poster Images</label>
                     <div className="relative">
-                        <AppInput
+                        <input
+                            ref={imagesInputRef}
                             id="poster_images"
                             placeholder="Upload Additional Poster Images"
                             type="file"
@@ -230,10 +249,14 @@ const CreateEditPosterForm: FC<CreateEditPosterFormProps> = ({
 
                 {vars.images.length > 0 && (
                     <div className="flex flex-wrap gap-6">
-                        {vars.images.map((image) => (
-                            <div key={image} className="w-full max-w-[150px] border border-accent border-dashed">
-                                <img src={image} className="w-full max-h-[120px] object-contain" />
-                            </div>
+                        {vars.images.map((image, index) => (
+                            <ImagePreviewCard
+                                image={image}
+                                key={image}
+                                className="max-w-[150px]"
+                                imageClasses="max-h-[120px]"
+                                onDelete={() => removeAdditionalImage(index)}
+                            />
                         ))}
                     </div>
                 )}
@@ -301,12 +324,7 @@ const CreateEditPosterForm: FC<CreateEditPosterFormProps> = ({
                     className="multi-select"
                     placeholder="Select Year"
                     defaultValue={{ label: vars.year, value: vars.year }}
-                    options={Array.from(Array(new Date().getFullYear() - 1929).keys())
-                        ?.sort((a, b) => b - a)
-                        ?.map((year) => ({
-                            value: year + 1930,
-                            label: year + 1930,
-                        }))}
+                    options={yearOptions as any}
                     onChange={(__year) => setVars((prev) => ({ ...prev, year: +__year?.value! }))}
                 />
             </div>
@@ -371,9 +389,9 @@ const CreateEditPosterForm: FC<CreateEditPosterFormProps> = ({
             </div>
 
             <div className="flex space-x-4 justify-between items-center">
-                <Paragraph className="text-accent text-xl">Make Poster Public</Paragraph>
+                <Paragraph className="text-accent text-xl">Make Poster Private</Paragraph>
                 <AppSwitch
-                    enabled={vars.visible}
+                    enabled={!vars.visible}
                     setEnabled={() => setVars((prev) => ({ ...prev, visible: !prev.visible }))}
                 />
             </div>

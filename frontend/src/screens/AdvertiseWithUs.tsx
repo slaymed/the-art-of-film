@@ -7,9 +7,16 @@ import TextHeader from "../components/elements/TextHeader";
 import H1 from "../components/elements/H1";
 import HeroSection from "../components/sections/HeroSection";
 
+import { AdvertisementType } from "../store/advertisements/enums";
+import { useSelector } from "react-redux";
+import { websiteSettings } from "../store/settings/selectors";
+import CurrencyConvert from "../components/kits/CurrencyConvert";
+
 export interface AdvertiseWithUsProps extends ComponentProps<"div"> {}
 
 const AdvertiseWithUs: FC<AdvertiseWithUsProps> = ({ className = "", ...rest }) => {
+    const settings = useSelector(websiteSettings);
+
     return (
         <div {...rest} className={classNames("", { [className]: className })}>
             <HeroSection heading="Advertise With Us" heading2="HOME / AdvertiseWithUs" image="/images/banner-1.png" />
@@ -45,8 +52,15 @@ const AdvertiseWithUs: FC<AdvertiseWithUsProps> = ({ className = "", ...rest }) 
                                     </Paragraph>
                                     <Paragraph>
                                         These links will appear on multiple pages throughout our Site. Each sponsored
-                                        link is priced at £25 per month or £250 for a year (2 months free). select your
-                                        preference when you ‘Add to Cart’.
+                                        link is priced at{" "}
+                                        <span className="text-accent text-xl">
+                                            <CurrencyConvert amount={(settings?.sponsor_price_for_day || 0.8) * 30} />
+                                        </span>{" "}
+                                        per month or{" "}
+                                        <span className="text-accent text-xl">
+                                            <CurrencyConvert amount={(settings?.sponsor_price_for_day || 0.8) * 305} />
+                                        </span>{" "}
+                                        for a year (2 months free). select your preference when you ‘Add to Cart’.
                                     </Paragraph>
                                     <Paragraph>
                                         When uploading your poster images to the showcase you select the format, country
@@ -63,7 +77,10 @@ const AdvertiseWithUs: FC<AdvertiseWithUsProps> = ({ className = "", ...rest }) 
                                     </Paragraph>
                                 </div>
                             </div>
-                            <Link to="/advertise" className="bg-accent w-fit py-2 px-6">
+                            <Link
+                                to={`/create-advertisement?pannel=${AdvertisementType.SPONSOR}`}
+                                className="bg-accent text-black font-bold tracking-widest w-fit py-2 px-6"
+                            >
                                 <Paragraph>Advertise with us</Paragraph>
                             </Link>
                         </div>
@@ -86,13 +103,19 @@ const AdvertiseWithUs: FC<AdvertiseWithUsProps> = ({ className = "", ...rest }) 
                                         available.
                                     </Paragraph>
                                     <Paragraph>
-                                        The price of a homepage banner is £350 per year. Once you have purchased your
-                                        homepage advertising a member of The Art of Film will be in touch to discuss the
-                                        artwork for your advert.
+                                        The price of a homepage banner starts from{" "}
+                                        <span className="text-accent text-xl">
+                                            <CurrencyConvert amount={(settings?.banner_price_for_day || 1.25) * 30} />
+                                        </span>
+                                        . Once you have purchased your homepage advertising a member of The Art of Film
+                                        will be in touch to discuss the artwork for your advert.
                                     </Paragraph>
                                 </div>
                             </div>
-                            <Link to="/advertise" className="bg-accent w-fit py-2 px-6">
+                            <Link
+                                to={`/create-advertisement?pannel=${AdvertisementType.BANNER}`}
+                                className="bg-accent text-black font-bold tracking-widest w-fit py-2 px-6"
+                            >
                                 <Paragraph>Advertise with us</Paragraph>
                             </Link>
                         </div>
@@ -117,7 +140,11 @@ const AdvertiseWithUs: FC<AdvertiseWithUsProps> = ({ className = "", ...rest }) 
                                     <Paragraph>
                                         The content of your advertorial must include valuable content for movie poster
                                         enthusiasts and will include links directly to your website. The price of an
-                                        advertorial is £500.
+                                        advertorial starts from{" "}
+                                        <span className="text-accent text-xl">
+                                            <CurrencyConvert amount={(settings?.advertorial_price_for_day || 2) * 60} />
+                                        </span>
+                                        .
                                     </Paragraph>
                                     <Paragraph>
                                         Once you have purchased your advertorial a member of The Art of Film will be in
@@ -132,7 +159,10 @@ const AdvertiseWithUs: FC<AdvertiseWithUsProps> = ({ className = "", ...rest }) 
                                     </Paragraph>
                                 </div>
                             </div>
-                            <Link to="/advertise" className="bg-accent w-fit py-2 px-6">
+                            <Link
+                                to={`/create-advertisement?pannel=${AdvertisementType.ADVERTORIAL}`}
+                                className="bg-accent text-black font-bold tracking-widest w-fit py-2 px-6"
+                            >
                                 <Paragraph>Advertise with us</Paragraph>
                             </Link>
                         </div>

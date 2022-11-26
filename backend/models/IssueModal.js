@@ -6,7 +6,7 @@ export const issueSchema = new mongoose.Schema(
         user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
         solved: { type: Boolean, required: true, default: false },
         becauseOf: { type: String, required: true },
-        solvedAt: { type: Date, default: null },
+        solvedAt: { type: Number, default: null },
     },
     {
         timestamps: true,

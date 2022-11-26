@@ -36,11 +36,11 @@
 }
 
 .slick-slide:not(.slick-center.slick-current) {
-    transform: perspective(720px) rotateY(50deg) translateZ(-150px);
+    transform: perspective(720px) rotateY(50deg) translateZ(-100px);
 }
 
 .slick-center.slick-current ~ .slick-slide {
-    transform: perspective(720px) rotateY(-50deg) translateZ(-150px);
+    transform: perspective(720px) rotateY(-50deg) translateZ(-100px);
 }
 
 @media (min-width: 640px) {

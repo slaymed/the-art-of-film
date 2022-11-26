@@ -21,7 +21,7 @@ const initailState: CreateEditPosterVars = {
     images: [],
     marketValue: 0,
     name: "",
-    visible: false,
+    visible: true,
     origin: "",
     price: "",
     salePrice: "",

@@ -28,7 +28,7 @@ const GrahamHumpreys: FC<GrahamHumpreysProps> = ({ className = "", ...rest }) =>
             <div className="bg-light-dark p-8 flex items-center justify-center">
                 <div className="container">
                     <SectionCard
-                        before="The Graham Humpreys"
+                        before="The Graham Humphreys"
                         title="Interview"
                         text="Intro test for You Tube Video in the blog Renowned graphics designer and film poster artist Graham Humphreys talks to The Art of Film about his incredible horror artwork including A Nightmare on Elm Street and The Evil Dead and much more."
                         linkText="SUBSCRIBE Today"

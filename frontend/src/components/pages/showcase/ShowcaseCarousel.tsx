@@ -68,13 +68,13 @@ const ShowcaseCarousel: FC<ShowcaseCarouselProps> = ({ className = "", products,
         beforeChange: (_, next) => dispatch(selectShowcaseProduct(products[next])),
         responsive: [
             {
-                breakpoint: 1800,
+                breakpoint: 1600,
                 settings: {
                     slidesToShow: products.length > 3 ? 3 : 1,
                 },
             },
             {
-                breakpoint: 1200,
+                breakpoint: 900,
                 settings: {
                     slidesToShow: 1,
                 },

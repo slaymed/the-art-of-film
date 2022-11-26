@@ -26,8 +26,9 @@ const SellerShowcaseCard: FC<SellerShowcaseCardProps> = ({ className = "", selle
                                 <img
                                     width="32px"
                                     src={
-                                        (seller.country && data.flags[seller.country]) ??
-                                        "https://upload.wikimedia.org/wikipedia/commons/b/b0/No_flag.svg"
+                                        seller.code
+                                            ? `https://countryflagsapi.com/png/${seller.code}`
+                                            : "https://upload.wikimedia.org/wikipedia/commons/b/b0/No_flag.svg"
                                     }
                                     alt={seller.name}
                                 />

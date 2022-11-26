@@ -53,7 +53,7 @@ const ChatOrderControl: FC<ChatOrderControlProps> = ({ user, order }) => {
             </div>
         );
 
-    if (order.isReceived)
+    if (order.isRecieved)
         return (
             <div className="flex items-center justify-center px-4 py-2 space-x-2 text-xs bg-accent/10 text-accent">
                 <span>

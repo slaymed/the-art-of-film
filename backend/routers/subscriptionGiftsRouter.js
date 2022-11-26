@@ -1,8 +1,10 @@
 import express from "express";
 import expressAsyncHandler from "express-async-handler";
+import { mapGiftSub } from "../helpers/map-gift-sub.js";
 
 import Gift from "../models/giftModal.js";
 import SubscriptionGift from "../models/SubscriptionGift.js";
+import Subscription from "../models/subscriptionModel.js";
 import { getGiftSub, getStripeSubscription, giftSubValid, isAuth, stripeSubValid } from "../utils.js";
 
 const subscriptionGiftsRouter = express.Router();
@@ -18,7 +20,7 @@ subscriptionGiftsRouter.post(
             if (stripeSubValid(stripeSub))
                 return res.status(401).json({ message: "You're already subscribed", redirect: "/my-subscription" });
 
-            const gift = await Gift.findOne({ code, is_paid: true, type: "subscription" });
+            const gift = await Gift.findOne({ code, is_paid: true, type: "subscription" }).populate("buyer");
             if (!gift) return res.status(404).json({ message: "Subscription Gift code not valid" });
             if (gift.usedBy || gift.used_at)
                 return res.status(401).json({ message: "Subscription Gift code already used" });
@@ -32,7 +34,7 @@ subscriptionGiftsRouter.post(
 
             const currentGiftSub = await getGiftSub(req.user);
             if (await giftSubValid(currentGiftSub)) {
-                if (currentGiftSub.targeted_sub.toString() !== gift.targeted_ref_id)
+                if (currentGiftSub.targeted_sub._id.toString() !== gift.targeted_ref_id)
                     return res.status(401).json({
                         message: "You're subscribed to another plan, can't merge two different plans!",
                         redirect: "/my-subscription",
@@ -50,8 +52,11 @@ subscriptionGiftsRouter.post(
 
                 await gift.save();
 
-                return res.status(200).json({ giftSub: savedGiftSub });
+                return res.status(200).json(mapGiftSub(savedGiftSub));
             }
+
+            const targeted_sub = await Subscription.findById(gift.targeted_ref_id);
+            if (!targeted_sub) return res.status(404).json({ message: "Targeted Subscription not found" });
 
             const giftSub = await new SubscriptionGift({
                 cancel_at,
@@ -60,7 +65,7 @@ subscriptionGiftsRouter.post(
                 user: req.user._id,
                 period: gift.period,
                 period_time,
-                targeted_sub: gift.targeted_ref_id,
+                targeted_sub,
                 active: true,
             }).save();
 
@@ -70,7 +75,7 @@ subscriptionGiftsRouter.post(
 
             await gift.save();
 
-            return res.status(200).json({ giftSub });
+            return res.status(200).json(mapGiftSub(giftSub));
         } catch (error) {
             return res.status(500).json(error);
         }

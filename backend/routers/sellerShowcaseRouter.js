@@ -65,7 +65,7 @@ sellerShowcaseRouter.get(
             for (const seller of topSellers) {
                 const subscribed = await is_subscribed(seller);
                 const count = await Product.find({ seller: seller._id, visible: true }).count();
-                if (subscribed && count > 1) showcaseList.push({ seller });
+                if (subscribed && count > 0) showcaseList.push({ seller });
                 if (showcaseList.length === 3) break;
             }
 

@@ -1,6 +1,6 @@
 import React, { FC, ComponentProps, useState } from "react";
 import classNames from "classnames";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import Paragraph from "../components/elements/Paragraph";
@@ -21,6 +21,7 @@ import { createGiftSubSession } from "../store/stripe/thunks";
 import { creatingSession } from "../store/stripe/selectors";
 import { ISession } from "../store/stripe/types";
 import { fetchingAvailableSubscriptions, selectSubScriptionById } from "../store/subscription/selectors";
+import Page from "../components/pages/Page";
 
 export interface BuyGiftSubScreenProps extends ComponentProps<"div"> {}
 
@@ -40,7 +41,7 @@ const BuyGiftSubScreen: FC<BuyGiftSubScreenProps> = ({ className = "", ...rest }
     const buy = async () => {
         if (!subscriptionId) return;
 
-        const res = await dispatch(buyGiftSub({ targeted_sub_id: subscriptionId, period: Period.MONETH }));
+        const res = await dispatch(buyGiftSub({ targeted_sub_id: subscriptionId, period }));
         const { status, data: gift } = res.payload as ThunkResponseType<IGift, GlobalMessage>;
         if (status !== RequestLifeCycle.SUCCESS || !gift) return;
 
@@ -54,12 +55,7 @@ const BuyGiftSubScreen: FC<BuyGiftSubScreenProps> = ({ className = "", ...rest }
     if (!userInfo) return null;
 
     return (
-        <div
-            {...rest}
-            className={classNames("p-8 sm:p-16 flex gap-8 bg-light-dark sm:gap-16 flex-col", {
-                [className]: className,
-            })}
-        >
+        <Page {...rest} className={classNames("sm:gap-16", { [className]: className })}>
             {loading && <LoadingBox className="mx-auto" />}
 
             {!sub && !loading && (
@@ -70,9 +66,14 @@ const BuyGiftSubScreen: FC<BuyGiftSubScreenProps> = ({ className = "", ...rest }
 
             {sub && (
                 <div className="flex gap-8 flex-col">
-                    <Paragraph className="text-3xl font-bold uppercase tracking-widest text-accent">
-                        Subscription
-                    </Paragraph>
+                    <div className="flex flex-wrap items-center justify-between gap-4">
+                        <Paragraph className="text-3xl font-bold uppercase tracking-widest text-accent">
+                            Subscription
+                        </Paragraph>
+                        <Link to="/redeem-gift-sub">
+                            <Paragraph className="text-sm underline underline-offset-2 text-accent">Redeem</Paragraph>
+                        </Link>
+                    </div>
 
                     <SubscriptionCard sub={sub} user={userInfo} showActions={false} />
 
@@ -105,7 +106,7 @@ const BuyGiftSubScreen: FC<BuyGiftSubScreenProps> = ({ className = "", ...rest }
                     </div>
                 </div>
             )}
-        </div>
+        </Page>
     );
 };
 

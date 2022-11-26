@@ -12,6 +12,7 @@ const giftSchema = new mongoose.Schema(
         targeted_ref_id: { type: String, default: null },
         paid_at: { type: Number, default: null },
         is_paid: { type: Boolean, default: false },
+        payment_record: { type: mongoose.Schema.Types.ObjectId, ref: "PaymentRecord" },
     },
     { timestamps: true }
 );

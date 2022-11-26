@@ -1,9 +1,10 @@
 import express from "express";
 import expressAsyncHandler from "express-async-handler";
 
+import get_or_create_stripe_customer from "../helpers/get-or-create-stripe-customer.js";
+import get_or_create_user_stripe_info from "../helpers/get_or_create_user_stripe_info.js";
 import getStripe from "../helpers/get-stripe.js";
 import hasErrors from "../helpers/has-errors.js";
-import UserStripeInfo from "../models/userStripeInfoModal.js";
 import { isAuth } from "../utils.js";
 
 const userStripeInfoRouter = express.Router();
@@ -13,17 +14,8 @@ userStripeInfoRouter.get(
     isAuth,
     expressAsyncHandler(async (req, res) => {
         try {
-            const userStripeInfo = await UserStripeInfo.findOne({ user: req.user._id });
-            if (!userStripeInfo)
-                return res
-                    .status(500)
-                    .json({ message: "Can't show your stripe info at the moment, please try again later." });
-
-            const stripe = await getStripe();
-
-            const customer = await stripe.customers.retrieve(userStripeInfo.customer);
-
-            return res.status(200).json({ customer });
+            const userStripeInfo = await get_or_create_user_stripe_info(req.user);
+            return res.status(200).json(userStripeInfo);
         } catch (error) {
             console.log(error);
             return res.status(500).json(error);
@@ -38,24 +30,18 @@ userStripeInfoRouter.post(
         try {
             const { pm_id } = req.body;
 
-            const userStripeInfo = await UserStripeInfo.findOne({ user: req.user._id });
-            if (!userStripeInfo)
-                return res
-                    .status(500)
-                    .json({ message: "Can't default your credit card at the moment, please try again later." });
+            const customer = await get_or_create_stripe_customer(req.user);
 
             const stripe = await getStripe();
-
-            const customer = await stripe.customers.retrieve(userStripeInfo.customer);
 
             if (customer.invoice_settings.default_payment_method === pm_id)
                 return res.status(401).json({ message: "Already a default card" });
 
-            const paymentMethods = await stripe.customers.listPaymentMethods(userStripeInfo.customer, { type: "card" });
+            const paymentMethods = await stripe.customers.listPaymentMethods(customer.id, { type: "card" });
             const found = paymentMethods.data.find((pm) => pm.id === pm_id);
             if (!found) return res.status(401).json({ message: "Unauthorized" });
 
-            const synced_customer = await stripe.customers.update(userStripeInfo.customer, {
+            const synced_customer = await stripe.customers.update(customer.id, {
                 invoice_settings: {
                     default_payment_method: pm_id,
                 },
@@ -89,17 +75,11 @@ userStripeInfoRouter.get(
     isAuth,
     expressAsyncHandler(async (req, res) => {
         try {
-            const userStripeInfo = await UserStripeInfo.findOne({ user: req.user._id });
-            if (!userStripeInfo)
-                return res
-                    .status(500)
-                    .json({ message: "Can't show your credit cards at the moment, please try again later." });
+            const customer = await get_or_create_stripe_customer(req.user);
 
             const stripe = await getStripe();
 
-            const customer = await stripe.customers.retrieve(userStripeInfo.customer);
-
-            const paymentMethods = await stripe.customers.listPaymentMethods(userStripeInfo.customer, { type: "card" });
+            const paymentMethods = await stripe.customers.listPaymentMethods(customer.id, { type: "card" });
 
             const creditCards = paymentMethods.data.map((pm) => ({
                 last4: pm.card.last4,
@@ -127,23 +107,17 @@ userStripeInfoRouter.post(
         try {
             const { pm_id } = req.body;
 
-            const userStripeInfo = await UserStripeInfo.findOne({ user: req.user._id });
-            if (!userStripeInfo)
-                return res
-                    .status(500)
-                    .json({ message: "Can't delete your credit card at the moment, please try again later." });
-
             const stripe = await getStripe();
 
-            const paymentMethods = await stripe.customers.listPaymentMethods(userStripeInfo.customer, { type: "card" });
+            const customer = await get_or_create_stripe_customer(req.user);
+
+            const paymentMethods = await stripe.customers.listPaymentMethods(customer.id, { type: "card" });
             const found = paymentMethods.data.find((pm) => pm.id === pm_id);
             if (!found) return res.status(401).json({ message: "Unauthorized" });
 
             await stripe.paymentMethods.detach(pm_id);
 
-            const customer = await stripe.customers.retrieve(userStripeInfo.customer);
-
-            const syncedPaymentMethods = await stripe.customers.listPaymentMethods(userStripeInfo.customer, {
+            const syncedPaymentMethods = await stripe.customers.listPaymentMethods(customer.id, {
                 type: "card",
             });
 
@@ -215,15 +189,9 @@ userStripeInfoRouter.post(
 
             if (hasErrors(errors)) return res.status(401).json(errors);
 
-            const userStripeInfo = await UserStripeInfo.findOne({ user: req.user._id });
-            if (!userStripeInfo)
-                return res
-                    .status(500)
-                    .json({ message: "Can't add credit card at the moment, please try again later." });
+            const customer = await get_or_create_stripe_customer(req.user);
 
             const stripe = await getStripe();
-
-            const customer = await stripe.customers.retrieve(userStripeInfo.customer);
 
             const paymentMethod = await stripe.paymentMethods.create({
                 type: "card",
@@ -243,18 +211,18 @@ userStripeInfoRouter.post(
             if (!paymentMethod) return res.status(401).json({ message: "Verify Card Detail" });
 
             const attachedPaymentMethod = await stripe.paymentMethods.attach(paymentMethod.id, {
-                customer: userStripeInfo.customer,
+                customer: customer.id,
             });
 
             if (!customer.invoice_settings.default_payment_method) {
-                await stripe.customers.update(userStripeInfo.customer, {
+                await stripe.customers.update(customer.id, {
                     invoice_settings: {
                         default_payment_method: attachedPaymentMethod.id,
                     },
                 });
             }
 
-            const synced_customer = await stripe.customers.retrieve(userStripeInfo.customer);
+            const synced_customer = await stripe.customers.retrieve(customer.id);
 
             const syncedPaymentMethods = await stripe.customers.listPaymentMethods(synced_customer.id, {
                 type: "card",

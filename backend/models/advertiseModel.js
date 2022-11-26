@@ -10,12 +10,33 @@ const advertiseSchema = new mongoose.Schema(
         title: { type: String, required: true },
         link: { type: String, required: true },
         image: { type: String, required: true },
+        paragraphs: { type: Array, default: [] },
+        images: { type: Array, default: [] },
         active: { type: Boolean, default: false },
+        activated_at: { type: Number, default: null },
         user: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
+        private_key: { type: String, required: true, unique: true },
+        period_time: { type: Number, required: true },
+        payment_record: { type: mongoose.Schema.Types.ObjectId, ref: "PaymentRecord" },
+        approved: { type: Boolean, default: true },
     },
     {
         timestamps: true,
     }
 );
 const Advertise = mongoose.model("Advertise", advertiseSchema);
+
+advertiseSchema.set("toJSON", {
+    transform: (doc, advertise, options) => {
+        delete advertise.user;
+
+        if (advertise.type !== "advertorial") {
+            delete advertise.paragraphs;
+            delete advertise.images;
+        }
+
+        return advertise;
+    },
+});
+
 export default Advertise;

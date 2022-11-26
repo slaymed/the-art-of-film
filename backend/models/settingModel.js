@@ -8,6 +8,11 @@ const settingSchema = new mongoose.Schema(
         site_favicon: { type: String, default: "" },
         site_keywords: { type: String, default: "" },
         min_withdraw_amount: { type: Number, default: 5 },
+        auto_release_orders_time: { type: Number, default: 1000 * 60 * 60 * 24 * 14 },
+        commission_percentage_on_sold_posters: { type: Number, default: 6 },
+        sponsor_price_for_day: { type: Number, default: 0.8 },
+        banner_price_for_day: { type: Number, default: 1.25 },
+        advertorial_price_for_day: { type: Number, default: 2 },
     },
     {
         timestamps: true,

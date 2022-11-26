@@ -7,8 +7,8 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "../hooks/useDispatch";
 
 import { fetchingHomeProducts, homeProductsSelector } from "../store/products/selectors";
-import { advertismentsSelector } from "../store/advertisments/selectors";
-import { fetchAdvertisment } from "../store/advertisments/thunk";
+import { advertisementsSelector } from "../store/advertisements/selectors";
+import { fetchAdvertisement } from "../store/advertisements/thunk";
 import { fetchHomeProducts } from "../store/products/thunks";
 import { fetchTopSellersShowcaseList } from "../store/showcase/thunks";
 import { topSellersShowcaseList } from "../store/showcase/selectors";
@@ -36,40 +36,18 @@ const HomeScreen: FC<HomeScreenProps> = ({ className = "", ...rest }) => {
 
     const products = useSelector(homeProductsSelector).slice(0, 6);
     const showcases = useSelector(topSellersShowcaseList);
-    const advertisements = useSelector(advertismentsSelector);
+    const advertisements = useSelector(advertisementsSelector);
     const { loading, errors } = useSelector(fetchingHomeProducts);
 
     useEffect(() => {
         dispatch(fetchHomeProducts());
         dispatch(fetchTopSellersShowcaseList());
-        dispatch(fetchAdvertisment());
+        dispatch(fetchAdvertisement());
     }, [dispatch]);
 
     return (
         <div {...rest} className={classNames("", { [className]: className })}>
-            <div
-                className="relative h-[556px]"
-                style={{ backgroundImage: advertisements?.length > 0 ? `` : "url(/images/home.jpg)" }}
-            >
-                {Array.isArray(advertisements) &&
-                    advertisements?.map((advertisment) => (
-                        <div
-                            className="absolute inset-0 overflow-hidden bg-contain"
-                            style={{ backgroundImage: `url(${advertisment.image})` }}
-                            key={advertisment.link}
-                        >
-                            <a
-                                className="z-10 absolte bottom-5 right-5"
-                                href={advertisment.link}
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                <i title="open" className="fa fa-window-maximize" />
-                                open
-                            </a>
-                        </div>
-                    ))}
-
+            <div className="relative h-[556px]" style={{ backgroundImage: "url(/images/home.jpg)" }}>
                 <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70">
                     <div className="flex flex-col space-y-10">
                         <H1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl text-center">

@@ -43,9 +43,13 @@ export interface GiftSub extends TimeStamp {
     start_date: number;
     user: string;
     gift: IGift;
-    targeted_sub: string;
+    targeted_sub: ISubscription;
     period: Period;
     period_time: number;
+    progress_percentage: number;
+    period_days: number;
+    used_days: number;
+    rest_days: number;
 }
 
 export type NextSub = {

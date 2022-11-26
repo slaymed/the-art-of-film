@@ -5,7 +5,7 @@ import { GiftType } from "./enums";
 
 export interface IGift extends TimeStamp {
     _id: string;
-    buyer: string;
+    buyer: User;
     usedBy: User | null;
     used_at: number | null;
     code?: string;

@@ -401,4 +401,11 @@ export const countrySelectOptions = data.origins.map(
     })
 );
 
+export const yearOptions = Array.from(Array(new Date().getFullYear() - 1899).keys())
+    .sort((a, b) => b - a)
+    .map((year) => ({
+        value: year + 1900,
+        label: year + 1900,
+    }));
+
 export default data;

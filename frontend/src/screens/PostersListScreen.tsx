@@ -154,7 +154,7 @@ const PostersListScreen: FC<PostersListScreenProps> = ({ className = "", ...rest
                                     </td>
                                     <td>
                                         <Paragraph className="text-sm pr-2 text-slate-400">
-                                            <CurrencyConvert amount={poster.price} />
+                                            <CurrencyConvert amount={poster.salePrice || poster.price} />
                                         </Paragraph>
                                     </td>
                                     <td className="hidden sm:table-cell">

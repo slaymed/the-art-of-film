@@ -57,11 +57,11 @@ const OrdersScreen: FC<OrdersScreenProps> = ({ className = "", ...rest }) => {
             case Filters.U_P:
                 return list.filter((o) => !o.isPaid);
             case Filters.D_N_R:
-                return list.filter((o) => o.isDelivered && !o.isReceived);
+                return list.filter((o) => o.isDelivered && !o.isRecieved);
             case Filters.P_N_D:
                 return list.filter((o) => o.isPaid && !o.isDelivered);
             case Filters.R:
-                return list.filter((o) => o.isReceived);
+                return list.filter((o) => o.isRecieved);
             default:
                 return list;
         }

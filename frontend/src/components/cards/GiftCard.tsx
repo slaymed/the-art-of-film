@@ -9,6 +9,7 @@ import Button from "../elements/Button";
 import { useSelector } from "react-redux";
 import { selectSubScriptionById } from "../../store/subscription/selectors";
 import { GOLD, PLATINUM, SILVER } from "../../store/subscription/constants";
+import SubscriptionColorText from "../kits/SubscriptionColorText";
 
 export interface GiftCardProps extends ComponentProps<"div"> {
     gift: IGift;
@@ -29,52 +30,39 @@ const GiftCard: FC<GiftCardProps> = ({ className = "", gift, ...rest }) => {
             })}
         >
             <Link to={`/subscribe/${sub._id}`}>
-                <Paragraph
-                    className={classNames(
-                        "text-3xl capitalize text-center underline underline-offset-4 font-bold tracking-widest",
-                        {
-                            "text-slate-400": sub.name === SILVER,
-                            "text-cyan-500": sub.name === PLATINUM,
-                            "text-accent": sub.name === GOLD,
-                        }
-                    )}
-                >
-                    {sub.name}
-                </Paragraph>
+                <SubscriptionColorText
+                    sub={sub}
+                    text={sub.name}
+                    className="text-3xl capitalize text-center underline underline-offset-4 font-bold tracking-widest"
+                />
             </Link>
+
+            <SubscriptionColorText
+                sub={sub}
+                text={`1 ${gift.period}`}
+                className="text-lg text-center font-bold tracking-widest uppercase"
+            />
 
             <Paragraph className="text-xl break-all tracking-widest mx-auto text-indigo-500 bg-indigo-500/20 text-center font-bold rounded w-fit py-1.5 px-4">
                 {gift.code}
             </Paragraph>
 
             <div className="flex items-center flex-wrap gap-4 justify-center">
-                <Paragraph
-                    className={classNames("text-sm capitalize underline underline-offset-2 font-bold tracking-widest", {
-                        "text-slate-400": sub.name === SILVER,
-                        "text-cyan-500": sub.name === PLATINUM,
-                        "text-accent": sub.name === GOLD,
-                    })}
-                >
-                    {gift.type}
-                </Paragraph>
-                <Paragraph
-                    className={classNames("text-sm font-bold underline underline-offset-2 tracking-widest", {
-                        "text-slate-400": sub.name === SILVER,
-                        "text-cyan-500": sub.name === PLATINUM,
-                        "text-accent": sub.name === GOLD,
-                    })}
-                >
-                    Paid
-                </Paragraph>
-                <Paragraph
-                    className={classNames("text-sm capitalize underline underline-offset-2 font-bold tracking-widest", {
-                        "text-slate-400": sub.name === SILVER,
-                        "text-cyan-500": sub.name === PLATINUM,
-                        "text-accent": sub.name === GOLD,
-                    })}
-                >
-                    {gift.used_at ? "Already used" : "Not used yet"}
-                </Paragraph>
+                <SubscriptionColorText
+                    sub={sub}
+                    text={gift.type}
+                    className="text-sm capitalize underline underline-offset-2 font-bold tracking-widest"
+                />
+                <SubscriptionColorText
+                    sub={sub}
+                    text="Paid"
+                    className="text-sm capitalize underline underline-offset-2 font-bold tracking-widest"
+                />
+                <SubscriptionColorText
+                    sub={sub}
+                    text={gift.used_at ? "Already used" : "Not used yet"}
+                    className="text-sm capitalize underline underline-offset-2 font-bold tracking-widest"
+                />
             </div>
 
             {!opened && (

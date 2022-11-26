@@ -65,7 +65,7 @@ const RaiseIssueScreen: FC<RaiseIssueScreenProps> = ({ className = "", ...rest }
                     />
                 </div>
 
-                {loading && <LoadingBox />}
+                {loading && <LoadingBox className="mx-auto" />}
 
                 <ErrorWithRedirect errors={errors} loading={loading} className="items-center" />
 

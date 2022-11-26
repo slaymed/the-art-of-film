@@ -1,3 +1,4 @@
+import refundPayment from "../../../../helpers/refundPayment.js";
 import Advertise from "../../../../models/advertiseModel.js";
 import Chat from "../../../../models/chatModel.js";
 import Gift from "../../../../models/giftModal.js";
@@ -12,6 +13,7 @@ export async function chargeRefunded(event, io) {
         const { ref, socketId } = object.metadata;
 
         const session = await Session.findOne({ payment_intent_id: object.payment_intent, ref });
+        if (!session) throw new Error("Session not found");
 
         session.refund = {
             amount: object.amount_refunded,
@@ -22,6 +24,8 @@ export async function chargeRefunded(event, io) {
         };
         session.status = "refunded";
         await session.save();
+
+        await refundPayment(session.payment_record, session.user ? session.user : null);
 
         switch (session.type) {
             case "advertisement":
@@ -56,6 +60,7 @@ export async function chargeRefunded(event, io) {
             case "gift":
                 const gift = await Gift.findById(session.ref);
                 if (gift) await gift.remove();
+                break;
             default:
                 throw new Error(`${session.type} Must be supported in charge.refunded event`);
         }

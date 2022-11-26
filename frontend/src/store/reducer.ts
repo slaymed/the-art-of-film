@@ -8,7 +8,7 @@ import ordersReducer from "./orders/reducer";
 import productsReducer from "./products/reducer";
 import stripeReducer from "./stripe/reducer";
 import uploadsReducer from "./upload/reducer";
-import advertismentReducer from "./advertisments/reducer";
+import advertisementReducer from "./advertisements/reducer";
 import paymentMethodsReducer from "./payment-methods/reducer";
 import subscriptionsReducer from "./subscription/reducer";
 import issuesReducer from "./issues/reducer";
@@ -17,13 +17,14 @@ import uiReducer from "./ui/reducer";
 import showcasesReducer from "./showcase/reducer";
 import withdrawRequestsReducer from "./withdraw-requests/reducer";
 import giftsReducer from "./gifts/reducer";
+import settingsReducer from "./settings/reducer";
 
 export default combineReducers({
     auth: authReducer,
     cart: cartReducer,
     currencyState: currencyReducer,
     products: productsReducer,
-    advertisments: advertismentReducer,
+    advertisements: advertisementReducer,
     chat: chatReducer,
     stripe: stripeReducer,
     uploads: uploadsReducer,
@@ -36,4 +37,5 @@ export default combineReducers({
     showcases: showcasesReducer,
     withdrawRequests: withdrawRequestsReducer,
     gifts: giftsReducer,
+    settings: settingsReducer,
 });

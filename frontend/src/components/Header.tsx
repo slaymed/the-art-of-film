@@ -41,7 +41,7 @@ const Header: FC<HeaderProps> = ({ className = "", ...rest }) => {
             })}
         >
             <div className="flex items-center justify-between px-12 py-2 bg-light-dark">
-                <div className="flex w-fit gap-14 items-center">
+                <div className="flex w-fit gap-4 sm:gap-14 items-center">
                     <Button className="text-accent lg:hidden" onClick={() => dispatch(toggleSideNav())}>
                         {sideBarActive ? (
                             <i className="text-md fa-solid fa-close" />

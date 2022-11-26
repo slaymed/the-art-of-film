@@ -84,7 +84,7 @@ const OrderInfoCard: FC<OrderInfoCardProps> = ({
                     order.haveIssue
                         ? "Have an Issue"
                         : order.isPaid
-                        ? order.isReceived
+                        ? order.isRecieved
                             ? "Recieved"
                             : order.isDelivered
                             ? "Delivered"

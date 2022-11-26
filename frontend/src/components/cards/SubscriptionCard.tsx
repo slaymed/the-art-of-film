@@ -17,6 +17,7 @@ import { currentSubscription, subscribing } from "../../store/subscription/selec
 import { User } from "../../store/auth/types";
 
 import { useDispatch } from "../../hooks/useDispatch";
+import SubscriptionColorText from "../kits/SubscriptionColorText";
 
 export interface SubscriptionCardProps extends ComponentProps<"div"> {
     sub: ISubscription;
@@ -39,27 +40,23 @@ const SubscriptionCard: FC<SubscriptionCardProps> = ({ className = "", sub, user
         <div {...rest} className={classNames("", { [className]: className })}>
             <div className="bg-dark-card p-8 flex flex-wrap gap-8 w-fit">
                 <div className="flex flex-col gap-4">
-                    <Paragraph
-                        className={classNames("capitalize text-accent tracking-widest font-bold", {
-                            "text-slate-400": sub.name === SILVER,
-                            "text-accent": sub.name === GOLD,
-                            "text-cyan-500": sub.name === PLATINUM,
-                        })}
-                    >
-                        Subscription Name
-                    </Paragraph>
-                    <Paragraph
+                    <SubscriptionColorText
+                        sub={sub}
+                        text="Subscription Name"
+                        className="capitalize text-accent tracking-widest font-bold"
+                    />
+                    <SubscriptionColorText
+                        sub={sub}
+                        text={sub.name}
                         className={classNames(
                             "text-sm py-0.5 px-2 rounded w-fit capitalize tracking-widest font-bold",
                             {
-                                "text-slate-400 bg-slate-400/20": sub.name === SILVER,
-                                "text-accent bg-accent/20": sub.name === GOLD,
-                                "text-cyan-500 bg-cyan-500/20": sub.name === PLATINUM,
+                                "!bg-slate-400/20": sub.name === SILVER,
+                                "!bg-cyan-500/20": sub.name === PLATINUM,
+                                "!bg-accent/20": sub.name === GOLD,
                             }
                         )}
-                    >
-                        {sub.name}
-                    </Paragraph>
+                    />
                 </div>
                 <div className="flex flex-col gap-4">
                     <Paragraph className="capitalize text-cyan-500 tracking-widest font-bold">Month Price</Paragraph>
@@ -75,7 +72,7 @@ const SubscriptionCard: FC<SubscriptionCardProps> = ({ className = "", sub, user
                 </div>
 
                 <div className="flex flex-col gap-4">
-                    <Paragraph className="capitalize text-blue-500 tracking-widest font-bold">Free Trail</Paragraph>
+                    <Paragraph className="capitalize text-blue-500 tracking-widest font-bold">Free Trial</Paragraph>
                     <Paragraph className="text-sm py-0.5 text-blue-500 bg-blue-500/20 px-2 rounded w-fit capitalize tracking-widest font-bold">
                         {user.trialUsed ? "Benefited" : "1 Month"}
                     </Paragraph>

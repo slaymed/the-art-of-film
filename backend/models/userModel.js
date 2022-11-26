@@ -13,8 +13,6 @@ const userSchema = new mongoose.Schema(
         postalCode: { type: String, required: false },
         country: { type: String, required: false },
         code: { type: String, required: false },
-        availableBalance: { type: Number, required: true, default: 0 },
-        pendingBalance: { type: Number, required: true, default: 0 },
         sessions: Array,
         sellerName: { type: String, required: true },
         logo: String,

@@ -10,6 +10,7 @@ import ChatListSection from "../components/sections/chat/ChatListSection";
 import ChatMessagesSection from "../components/sections/chat/ChatMessagesSection";
 import Paragraph from "../components/elements/Paragraph";
 import ChatOrderSection from "../components/sections/chat/ChatOrderSection";
+import Page from "../components/pages/Page";
 
 export interface ChatScreenProps extends ComponentProps<"div"> {}
 
@@ -21,7 +22,7 @@ const ChatScreen: FC<ChatScreenProps> = ({ className = "", ...rest }) => {
     useEffect(() => () => dispatch(updateChatId(null)), [dispatch]);
 
     return (
-        <div {...rest} className={classNames("flex flex-col p-8 space-y-8 bg-light-dark", { [className]: className })}>
+        <Page {...rest} className={classNames("", { [className]: className })}>
             <div className="flex items-center space-x-6">
                 <span>
                     <i className="text-5xl fa-solid fa-comments" />
@@ -51,7 +52,7 @@ const ChatScreen: FC<ChatScreenProps> = ({ className = "", ...rest }) => {
                     <ChatOrderSection />
                 </div>
             </div>
-        </div>
+        </Page>
     );
 };
 

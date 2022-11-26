@@ -1,7 +1,8 @@
-import React, { FC, ComponentProps, FormEvent, useState, Fragment, ChangeEvent } from "react";
+import React, { FC, ComponentProps, FormEvent, useState, Fragment, ChangeEvent, useEffect } from "react";
 import classNames from "classnames";
 import { useSelector } from "react-redux";
 import { Tab } from "@headlessui/react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import PageLayout from "../layout/PageLayout";
 import Paragraph from "../components/elements/Paragraph";
@@ -23,14 +24,12 @@ import {
 import { addingWithdrawRequest } from "../store/withdraw-requests/selectors";
 import { createWithdrawRequest } from "../store/withdraw-requests/thunks";
 import { AccountType } from "../store/withdraw-requests/enums";
-
 import { useDispatch } from "../hooks/useDispatch";
 import { user } from "../store/auth/selectors";
 import { User } from "../store/auth/types";
 import { ThunkResponseType } from "../store/types";
 import { RequestLifeCycle } from "../store/enums";
 import { fireUserUpdated_RT } from "../store/auth/actions";
-import { useNavigate } from "react-router-dom";
 
 const bankAccountInitialState: Bank_Account = {
     account_name: "",
@@ -51,6 +50,9 @@ const WithdrawScreen: FC<WithdrawScreenProps> = ({ className = "", ...rest }) =>
     const userInfo = useSelector(user) as User;
     const currency = useSelector(currencySelector);
     const { loading, errors } = useSelector(addingWithdrawRequest);
+
+    const [usp, setUsp] = useSearchParams();
+    const pannel = (usp.get("pannel") || AccountType.BANK_ACCOUNT) as AccountType;
 
     const [tabIndex, setTabIndex] = useState(0);
 
@@ -84,6 +86,19 @@ const WithdrawScreen: FC<WithdrawScreenProps> = ({ className = "", ...rest }) =>
 
     const selectAllAvailableBalance = () => setAmount(userInfo.availableBalance.toString());
 
+    useEffect(() => {
+        switch (pannel) {
+            case AccountType.BANK_ACCOUNT:
+                setTabIndex(0);
+                break;
+            case AccountType.PAYPAL_ACCOUNT:
+                setTabIndex(1);
+                break;
+            default:
+                setTabIndex(0);
+        }
+    }, [pannel]);
+
     if (!userInfo) return null;
 
     return (
@@ -105,7 +120,7 @@ const WithdrawScreen: FC<WithdrawScreenProps> = ({ className = "", ...rest }) =>
                                 {({ selected }) => (
                                     <button
                                         type="button"
-                                        onClick={() => setTabIndex(0)}
+                                        onClick={() => setUsp({ pannel: AccountType.BANK_ACCOUNT })}
                                         className={classNames("w-full py-3 px-6 duration-200", {
                                             "bg-accent text-black font-bold": selected,
                                         })}
@@ -118,7 +133,7 @@ const WithdrawScreen: FC<WithdrawScreenProps> = ({ className = "", ...rest }) =>
                                 {({ selected }) => (
                                     <button
                                         type="button"
-                                        onClick={() => setTabIndex(1)}
+                                        onClick={() => setUsp({ pannel: AccountType.PAYPAL_ACCOUNT })}
                                         className={classNames("w-full py-3 px-6 duration-200", {
                                             "bg-accent text-black font-bold": selected,
                                         })}

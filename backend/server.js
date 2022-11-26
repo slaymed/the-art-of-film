@@ -28,6 +28,7 @@ import Socket from "./models/socketModal.js";
 import tagsRouter from "./routers/tagsRouter.js";
 import sellerShowcaseRouter from "./routers/sellerShowcaseRouter.js";
 import withdrawRequestsRouter from "./routers/withdrawRequestsRouter.js";
+import settingsRouter from "./routers/settingsRouter.js";
 
 dotenv.config();
 
@@ -52,6 +53,7 @@ mongoose.connect(
 );
 
 app.use("/webhooks", webhooksRouter);
+app.use("/api/settings", settingsRouter);
 app.use("/api/uploads", uploadRouter);
 app.use("/api/users", userRouter);
 app.use("/api/subscriptions", subscriptionRouter);
@@ -103,8 +105,6 @@ io.on("connection", async (socket) => {
         if (saved) await saved.remove();
     });
 });
-
-new Worker("./backend/workers/collector.js");
 
 server.listen(port, async () => {
     const sockets = await Socket.find();

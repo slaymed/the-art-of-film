@@ -11,6 +11,8 @@ import Cart from "../models/cartModal.js";
 import Socket from "../models/socketModal.js";
 import getStripe from "../helpers/get-stripe.js";
 import UserStripeInfo from "../models/userStripeInfoModal.js";
+import create_stripe_customer from "../helpers/create_stripe_customer.js";
+import get_or_create_user_stripe_info from "../helpers/get_or_create_user_stripe_info.js";
 
 const userRouter = express.Router();
 
@@ -167,27 +169,7 @@ userRouter.post(
 
             const createdUser = await user.save();
 
-            const stripe = await getStripe();
-
-            const test_clock = await stripe.testHelpers.testClocks.create({
-                frozen_time: 1000 * 60 * 60 * 24 * 30,
-            });
-
-            const customer = await stripe.customers.create({
-                name: user.name,
-                email: user.email,
-                metadata: {
-                    userId: user._id,
-                },
-                test_clock: test_clock.id,
-            });
-
-            const userStripeInfo = new UserStripeInfo({
-                customer: customer.id,
-                user: user._id,
-            });
-
-            await userStripeInfo.save();
+            await get_or_create_user_stripe_info(user);
 
             const token = generateToken(createdUser._id.toString());
 
@@ -216,7 +198,7 @@ userRouter.post(
 
             const token = crypto.randomBytes(20).toString("hex");
             user.resetPasswordToken = token;
-            user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+            user.resetPasswordExpires = new Date().getTime() + 3600000; // 1 hour
             await user.save();
 
             sendResetPasswordEmail({
@@ -243,7 +225,7 @@ userRouter.post(
         try {
             const user = await User.findOne({
                 resetPasswordToken: req.params.token,
-                resetPasswordExpires: { $gt: Date.now() },
+                resetPasswordExpires: { $gt: new Date().getTime() },
             });
             if (!user) return res.status(401).json({ message: "Password reset token is invalid or has been expired." });
 
