@@ -2,9 +2,9 @@ import { LazyOperationInitialState, OperationInitialState } from "./../initial-s
 import {
     CREATE_POSTER,
     FETCH_MY_PRODUCTS,
-    FETCH_MY_PRODUCTS_TARGETED_VALUE,
+    FETCH_MY_PRODUCTS_TARGET_VALUE,
     FETCH_HOME_PRODUCTS,
-    FETCH_HOME_PRODUCTS_TARGETED_VALUE,
+    FETCH_HOME_PRODUCTS_TARGET_VALUE,
     UPDATE_POSTER,
 } from "./constants";
 
@@ -15,8 +15,8 @@ export const ProductsInitialState: IProductsState = {
     [FETCH_MY_PRODUCTS]: LazyOperationInitialState,
     [CREATE_POSTER]: OperationInitialState,
     [UPDATE_POSTER]: OperationInitialState,
-    [FETCH_HOME_PRODUCTS_TARGETED_VALUE]: [],
-    [FETCH_MY_PRODUCTS_TARGETED_VALUE]: [],
+    [FETCH_HOME_PRODUCTS_TARGET_VALUE]: [],
+    [FETCH_MY_PRODUCTS_TARGET_VALUE]: [],
     remove: OperationInitialState,
     selectedProduct: null,
     fetchingSelectedProduct: OperationInitialState,

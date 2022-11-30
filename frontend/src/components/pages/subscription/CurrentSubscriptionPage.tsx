@@ -47,7 +47,7 @@ const CurrentSubscriptionPage: FC<CurrentSubscriptionPageProps> = ({ className =
             {sub.sub_data && (
                 <div className="flex flex-col space-y-4">
                     <div className="flex items-center justify-between flex-wrap">
-                        <Paragraph className="text-accent text-lg sm:text-xl font-bold tracking-widest uppercase">
+                        <Paragraph className="text-slate-400 text-lg sm:text-xl font-bold tracking-widest uppercase">
                             Current Subscription
                         </Paragraph>
                         <RefetchButton onClick={refetch} />
@@ -99,7 +99,7 @@ const CurrentSubscriptionPage: FC<CurrentSubscriptionPageProps> = ({ className =
 
             {sub.invoice && (
                 <div className="flex flex-col space-y-4">
-                    <Paragraph className="text-accent text-lg sm:text-xl font-bold tracking-widest uppercase">
+                    <Paragraph className="text-slate-400 text-lg sm:text-xl font-bold tracking-widest uppercase">
                         Last Invoice
                     </Paragraph>
                     <div className="flex gap-4 items-center flex-wrap">

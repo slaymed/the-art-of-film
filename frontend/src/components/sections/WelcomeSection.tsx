@@ -10,10 +10,9 @@ const WelcomeSection: FC<WelcomeSectionProps> = ({ className = "", style = {}, .
     return (
         <div
             {...rest}
-            className={classNames("flex mx-auto justify-between max-w-3xl mt-8", {
+            className={classNames("flex justify-center gap-8 p-8 flex-wrap items-center", {
                 [className]: className,
             })}
-            style={{ ...style, padding: "5em 0" }}
         >
             <div className="flex flex-col items-center justify-center m-8 space-y-6">
                 <img src={ShowcaseImage} alt="" />

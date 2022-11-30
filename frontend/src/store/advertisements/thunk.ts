@@ -9,6 +9,12 @@ import {
     CREATE_ADVERTISE_URL,
     FETCH_ADVERTISEMENT_PREFIX,
     FETCH_ADVERTISEMENT_URL,
+    FETCH_HOME_SCREEN_ADVERTISEMENT_BANNER_PREFIX,
+    FETCH_HOME_SCREEN_ADVERTISEMENT_BANNER_URL,
+    FETCH_VISIBLE_ADVERTORIALS_PREFIX,
+    FETCH_VISIBLE_ADVERTORIALS_URL,
+    FETCH_VISIBLE_SPONSORED_LINKS_PREFIX,
+    FETCH_VISIBLE_SPONSORED_LINKS_URL,
     SYNC_ADVERTISE_PREFIX,
     SYNC_ADVERTISE_URL,
     UPDATE_ADVERTISE_PREFIX,
@@ -66,6 +72,54 @@ export const syncAdvertise = createAsyncThunk(
             return {
                 status: RequestLifeCycle.SUCCESS,
                 data: res.data as Advertisement,
+            };
+        } catch (errors) {
+            return rejectWithValue({ status: RequestLifeCycle.FAILED, errors: mapErrors(errors) });
+        }
+    }
+);
+
+export const fetchHomeScreenAdvertisementBanner = createAsyncThunk(
+    FETCH_HOME_SCREEN_ADVERTISEMENT_BANNER_PREFIX,
+    async (_, { rejectWithValue }) => {
+        try {
+            const res = await axios.get(FETCH_HOME_SCREEN_ADVERTISEMENT_BANNER_URL);
+
+            return {
+                status: RequestLifeCycle.SUCCESS,
+                data: res.data as Advertisement | null,
+            };
+        } catch (errors) {
+            return rejectWithValue({ status: RequestLifeCycle.FAILED, errors: mapErrors(errors) });
+        }
+    }
+);
+
+export const fetchVisibleSponsoredLinks = createAsyncThunk(
+    FETCH_VISIBLE_SPONSORED_LINKS_PREFIX,
+    async (_, { rejectWithValue, getState }) => {
+        try {
+            const res = await axios.get(FETCH_VISIBLE_SPONSORED_LINKS_URL);
+
+            return {
+                status: RequestLifeCycle.SUCCESS,
+                data: res.data as Advertisement[],
+            };
+        } catch (errors) {
+            return rejectWithValue({ status: RequestLifeCycle.FAILED, errors: mapErrors(errors) });
+        }
+    }
+);
+
+export const fetchVisibleAdvertorials = createAsyncThunk(
+    FETCH_VISIBLE_ADVERTORIALS_PREFIX,
+    async (_, { rejectWithValue, getState }) => {
+        try {
+            const res = await axios.get(FETCH_VISIBLE_ADVERTORIALS_URL);
+
+            return {
+                status: RequestLifeCycle.SUCCESS,
+                data: res.data as Advertisement[],
             };
         } catch (errors) {
             return rejectWithValue({ status: RequestLifeCycle.FAILED, errors: mapErrors(errors) });

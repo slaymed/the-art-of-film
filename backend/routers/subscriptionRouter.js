@@ -39,14 +39,14 @@ subscriptionRouter.post(
                 });
 
                 const stripe_month_price = await stripe.prices.create({
-                    unit_amount: sub.monthPrice * 100,
+                    unit_amount: Math.round(sub.monthPrice * 100),
                     currency: "gbp",
                     recurring: { interval: "month" },
                     product: stripe_product.id,
                 });
 
                 const stripe_year_price = await stripe.prices.create({
-                    unit_amount: sub.yearPrice * 100,
+                    unit_amount: Math.round(sub.yearPrice * 100),
                     currency: "gbp",
                     recurring: { interval: "year" },
                     product: stripe_product.id,

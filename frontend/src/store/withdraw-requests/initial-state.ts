@@ -1,4 +1,3 @@
-import { LazyOperationInitialState, OperationInitialState } from "../initial-state";
 import { CANCELING_WITHDRAW_REQUEST, CREATING_WITHDRAW_REQUEST, FETCHING_WITHDRAW_REQUESTS } from "./constants";
 import { IWithdrawRequestsState, WithdrawRequestErrors, WithdrawRequestOperation } from "./types";
 

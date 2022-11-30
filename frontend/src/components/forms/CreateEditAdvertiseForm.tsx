@@ -1,28 +1,30 @@
 import React, { FC, ComponentProps, useState, ChangeEvent, useCallback, FormEvent, memo, useRef } from "react";
 import classNames from "classnames";
-import { Advertisement, CreateEditAdvertiseVars } from "../../store/advertisements/types";
-import Button from "../elements/Button";
-import Paragraph from "../elements/Paragraph";
-import MessageBox from "../kits/MessageBox";
 import { useSelector } from "react-redux";
+
+import { Advertisement, CreateEditAdvertiseVars } from "../../store/advertisements/types";
 import { creatingAdvertisement, updatingAdvertisement } from "../../store/advertisements/selectors";
 import { uploadOperation } from "../../store/upload/selectors";
-import LoadingBox from "../kits/LoadingBox";
-import ErrorWithRedirect from "../kits/ErrorWithRedirect";
-import AppInput from "../elements/AppInput";
-import TextHeader from "../elements/TextHeader";
-import { useDispatch } from "../../hooks/useDispatch";
 import { uploadFile } from "../../store/upload/thunks";
 import { GlobalMessage, ThunkResponseType } from "../../store/types";
 import { UploadResponse } from "../../store/upload/types";
 import { AdvertisementType } from "../../store/advertisements/enums";
-import ImagePreviewCard from "../cards/ImagePreviewCard";
 import { createAdvertise, updateAdvertise } from "../../store/advertisements/thunk";
 import { createAdvertiseSession } from "../../store/stripe/thunks";
 import { ISession } from "../../store/stripe/types";
-import CurrencyConvert from "../kits/CurrencyConvert";
 import { RequestLifeCycle } from "../../store/enums";
-import { useNavigate } from "react-router-dom";
+import { creatingSession } from "../../store/stripe/selectors";
+
+import Button from "../elements/Button";
+import TextHeader from "../elements/TextHeader";
+import Paragraph from "../elements/Paragraph";
+import MessageBox from "../kits/MessageBox";
+import LoadingBox from "../kits/LoadingBox";
+import ErrorWithRedirect from "../kits/ErrorWithRedirect";
+import CurrencyConvert from "../kits/CurrencyConvert";
+import ImagePreviewCard from "../cards/ImagePreviewCard";
+
+import { useDispatch } from "../../hooks/useDispatch";
 
 export interface CreateEditAdvertiseFormProps extends ComponentProps<"form"> {
     initialState: CreateEditAdvertiseVars;
@@ -40,6 +42,7 @@ const CreateEditAdvertiseForm: FC<CreateEditAdvertiseFormProps> = ({
     const dispatch = useDispatch();
 
     const { loading, errors } = useSelector(operation === "create" ? creatingAdvertisement : updatingAdvertisement);
+    const sessionOperation = useSelector(creatingSession);
     const upload = useSelector(uploadOperation);
 
     const [vars, setVars] = useState(initialState);
@@ -410,9 +413,14 @@ const CreateEditAdvertiseForm: FC<CreateEditAdvertiseFormProps> = ({
             )}
 
             {loading && <LoadingBox />}
+            {sessionOperation.loading && operation === "create" && <LoadingBox />}
             <ErrorWithRedirect errors={errors} loading={loading} />
 
-            <Button className="py-3 px-6 w-full bg-accent" type="submit">
+            <Button
+                className="py-3 px-6 w-full bg-accent"
+                type="submit"
+                disabled={loading || sessionOperation.loading || upload.loading}
+            >
                 <Paragraph className="font-bold capitalize text-black tracking-wider text-lg">
                     {operation} Advertisement
                 </Paragraph>

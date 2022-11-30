@@ -3,6 +3,7 @@ import classNames from "classnames";
 
 import TextHeader from "../components/elements/TextHeader";
 import Paragraph from "../components/elements/Paragraph";
+import CombinedAdsSection from "../components/sections/ads/CombinedAdsSection";
 
 export interface WhyFilmPostersProps extends ComponentProps<"div"> {}
 
@@ -90,6 +91,8 @@ const WhyFilmPosters: FC<WhyFilmPostersProps> = ({ className = "", ...rest }) =>
                         from the 1930s to the modern-day.
                     </Paragraph>
                 </div>
+
+                <CombinedAdsSection flex="row" sizeClasses="w-[282px] h-[282px]" className="bg-dark-card rounded-xl" />
 
                 <div className="flex flex-col w-full gap-8">
                     <TextHeader className="text-6xl sm:text-7xl">

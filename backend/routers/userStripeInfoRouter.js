@@ -15,6 +15,8 @@ userStripeInfoRouter.get(
     expressAsyncHandler(async (req, res) => {
         try {
             const userStripeInfo = await get_or_create_user_stripe_info(req.user);
+            if (!userStripeInfo) throw new Error("Something went wrong");
+
             return res.status(200).json(userStripeInfo);
         } catch (error) {
             console.log(error);
@@ -31,6 +33,7 @@ userStripeInfoRouter.post(
             const { pm_id } = req.body;
 
             const customer = await get_or_create_stripe_customer(req.user);
+            if (!customer || customer.deleted) throw new Error("Something went wrong");
 
             const stripe = await getStripe();
 
@@ -76,6 +79,7 @@ userStripeInfoRouter.get(
     expressAsyncHandler(async (req, res) => {
         try {
             const customer = await get_or_create_stripe_customer(req.user);
+            if (!customer || customer.deleted) throw new Error("Something went wrong");
 
             const stripe = await getStripe();
 
@@ -110,6 +114,7 @@ userStripeInfoRouter.post(
             const stripe = await getStripe();
 
             const customer = await get_or_create_stripe_customer(req.user);
+            if (!customer || customer.deleted) throw new Error("Something went wrong");
 
             const paymentMethods = await stripe.customers.listPaymentMethods(customer.id, { type: "card" });
             const found = paymentMethods.data.find((pm) => pm.id === pm_id);
@@ -190,6 +195,7 @@ userStripeInfoRouter.post(
             if (hasErrors(errors)) return res.status(401).json(errors);
 
             const customer = await get_or_create_stripe_customer(req.user);
+            if (!customer || customer.deleted) throw new Error("Something went wrong");
 
             const stripe = await getStripe();
 

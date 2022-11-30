@@ -1,5 +1,4 @@
-import React, { FC, ComponentProps, useMemo, useRef, useEffect } from "react";
-import classNames from "classnames";
+import React, { FC, ComponentProps, useMemo, useRef } from "react";
 import Slider from "react-slick";
 import "./ShowcaseSlider.css";
 

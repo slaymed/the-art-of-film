@@ -13,7 +13,7 @@ import {
     SUBSCRIBE_PREFIX,
     SUBSCRIBE_URL,
 } from "./constants";
-import { CurrentSub, GiftSub, ISubscription, SubscribeParams } from "./types";
+import { CurrentSub, ISubscription, SubscribeParams } from "./types";
 
 export const fetchAvailableSubscriptions = createAsyncThunk(
     FETCH_AVAILABLE_SUBSCRIPTIONS_PREFIX,

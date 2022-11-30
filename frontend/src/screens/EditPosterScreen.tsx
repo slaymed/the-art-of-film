@@ -9,6 +9,7 @@ import PageLayout from "../layout/PageLayout";
 import Paragraph from "../components/elements/Paragraph";
 import EditProductPage from "../components/pages/products/EditProductPage";
 import LoadingBox from "../components/kits/LoadingBox";
+import MessageBox from "../components/kits/MessageBox";
 
 export interface EditPosterScreenProps extends ComponentProps<"div"> {}
 
@@ -30,6 +31,8 @@ const EditPosterScreen: FC<EditPosterScreenProps> = ({ className = "", ...rest }
                 </div>
             </PageLayout>
         );
+
+    if (product.sold) return <MessageBox>Can't edit sold poster</MessageBox>;
 
     return <EditProductPage product={product} />;
 };

@@ -7,7 +7,7 @@ export type RolledORFolded = "Rolled" | "Folded";
 export interface IProduct extends TimeStamp {
     _id: string;
     name: string;
-    seller: User;
+    seller: User | string;
     image: string;
     images: string[];
     directors: ITag[];

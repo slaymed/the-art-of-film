@@ -1,4 +1,4 @@
-import React, { FC, ComponentProps, SetStateAction, Dispatch } from "react";
+import React, { FC, ComponentProps } from "react";
 import classNames from "classnames";
 import { Switch } from "@headlessui/react";
 

@@ -41,6 +41,9 @@ module.exports = {
                 23: "5.75rem",
                 "top-nav": "195.61px",
             },
+            screens: {
+                xs: "480px",
+            },
         },
     },
     plugins: [require("@tailwindcss/line-clamp")],

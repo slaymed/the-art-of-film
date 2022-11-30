@@ -72,11 +72,14 @@ export const deletePoster = createAsyncThunk(DELETE_POSTER_PREFIX, async (produc
     }
 });
 
-export const fetchProduct = createAsyncThunk(FETCH_PRODUCT_PREFIX, async (productId: string, { rejectWithValue }) => {
-    try {
-        const res = await axios.get(FETCH_PRODUCT_URL + productId);
-        return { status: RequestLifeCycle.SUCCESS, data: res.data as IProduct };
-    } catch (errors) {
-        return rejectWithValue({ status: RequestLifeCycle.FAILED, errors: mapErrors(errors) });
+export const fetchSelectedProduct = createAsyncThunk(
+    FETCH_PRODUCT_PREFIX,
+    async (productId: string, { rejectWithValue }) => {
+        try {
+            const res = await axios.get(FETCH_PRODUCT_URL + productId);
+            return { status: RequestLifeCycle.SUCCESS, data: res.data as IProduct };
+        } catch (errors) {
+            return rejectWithValue({ status: RequestLifeCycle.FAILED, errors: mapErrors(errors) });
+        }
     }
-});
+);

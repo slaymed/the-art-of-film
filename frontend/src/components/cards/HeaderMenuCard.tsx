@@ -43,7 +43,7 @@ const HeaderMenuCard: FC<HeaderMenuCardProps> = ({ className = "", ...rest }) =>
                     <Link className="tracking-widest text-accent" to="/sellers">
                         <Menu.Item>{() => <span className="text-xl">Showcase</span>}</Menu.Item>
                     </Link>
-                    <Link className="tracking-widest text-accent" to="/shop/name">
+                    <Link className="tracking-widest text-accent" to="/shop">
                         <Menu.Item>{() => <span className="text-xl">Shop</span>}</Menu.Item>
                     </Link>
                     <Link className="tracking-widest text-accent" to="/faq">

@@ -4,7 +4,6 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 import Paragraph from "../components/elements/Paragraph";
-import FilterCard from "../components/cards/FilterCard";
 import LoadingBox from "../components/kits/LoadingBox";
 import ErrorWithRedirect from "../components/kits/ErrorWithRedirect";
 import CurrencyConvert from "../components/kits/CurrencyConvert";
@@ -13,6 +12,7 @@ import RefetchButton from "../components/kits/RefetchButton";
 import Button from "../components/elements/Button";
 import H1 from "../components/elements/H1";
 import PageLayout from "../layout/PageLayout";
+import AlphbetNumericFilter from "../components/kits/AlphbetNumericFilter";
 
 import { useDispatch } from "../hooks/useDispatch";
 
@@ -67,18 +67,7 @@ const PostersListScreen: FC<PostersListScreenProps> = ({ className = "", ...rest
                     </div>
                 </div>
 
-                <div className="flex flex-wrap gap-3">
-                    <FilterCard alphabet="All" filter={filter} onClick={() => updateFilter("All")} />
-                    {Array.from(Array(26).keys()).map((index) => (
-                        <FilterCard
-                            key={index}
-                            alphabet={String.fromCharCode(index + 65)}
-                            filter={filter}
-                            onClick={() => updateFilter(String.fromCharCode(index + 65))}
-                        />
-                    ))}
-                    <FilterCard alphabet="0..9" filter={filter} onClick={() => updateFilter("0..9")} />
-                </div>
+                <AlphbetNumericFilter filter={filter} updateFilter={updateFilter} />
 
                 {fetching.loading && <LoadingBox />}
                 <ErrorWithRedirect {...fetching} />

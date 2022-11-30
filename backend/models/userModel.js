@@ -10,6 +10,8 @@ const userSchema = new mongoose.Schema(
         password: { type: String, required: true },
         address: { type: String, required: false },
         city: { type: String, required: false },
+        availableBalance: { type: Number, default: 0 },
+        pendingBalance: { type: Number, default: 0 },
         postalCode: { type: String, required: false },
         country: { type: String, required: false },
         code: { type: String, required: false },

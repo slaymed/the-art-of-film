@@ -14,7 +14,7 @@ const SearchBox: FC<SearchBoxProps> = ({ className = "", ...rest }) => {
 
     const submitHandler = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        navigate(`/shop/name/${name}`);
+        navigate(`/shop?name=${name}`);
     };
 
     return (

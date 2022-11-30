@@ -18,5 +18,6 @@ export interface ICartState {
     clearing: GlobalOperation;
     updating: GlobalOperation;
     fetching: GlobalOperation;
+    removing: GlobalOperation;
     data: ICart | null;
 }

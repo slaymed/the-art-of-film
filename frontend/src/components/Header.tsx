@@ -3,17 +3,20 @@ import classNames from "classnames";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
-import { user } from "../store/auth/selectors";
 import { useDispatch } from "../hooks/useDispatch";
+
+import TextHeader from "./elements/TextHeader";
+import HeaderMenuCard from "./cards/HeaderMenuCard";
+import Button from "./elements/Button";
+
+import { user } from "../store/auth/selectors";
 import { updateCurrency } from "../store/currency/actions";
 import { Currency } from "../store/currency/types";
 import { EUR, GBP, JPY, USD } from "../store/currency/constants";
-import TextHeader from "./elements/TextHeader";
 import { cartData } from "../store/cart/selectors";
-import HeaderMenuCard from "./cards/HeaderMenuCard";
-import Button from "./elements/Button";
 import { sideBarVisible } from "../store/ui/selectors";
 import { toggleSideNav } from "../store/ui/actions";
+import { currencySelector } from "../store/currency/selectors";
 
 export interface HeaderProps extends ComponentProps<"header"> {}
 
@@ -25,6 +28,7 @@ const Header: FC<HeaderProps> = ({ className = "", ...rest }) => {
     const sideBarActive = useSelector(sideBarVisible);
     const userInfo = useSelector(user);
     const cart = useSelector(cartData);
+    const currency = useSelector(currencySelector);
 
     const changeCurrency = useCallback(
         (event: ChangeEvent<HTMLSelectElement>) => {
@@ -68,7 +72,7 @@ const Header: FC<HeaderProps> = ({ className = "", ...rest }) => {
                 <div className="flex items-center lg:space-x-8 w-fit">
                     <select
                         className="px-2.5 tracking-wider text-white bg-transparent"
-                        defaultValue={GBP}
+                        value={currency}
                         onChange={changeCurrency}
                     >
                         <option value={GBP} className="text-black">
@@ -104,7 +108,7 @@ const Header: FC<HeaderProps> = ({ className = "", ...rest }) => {
                     <Link className="text-lg tracking-widest text-accent" to="/sellers">
                         Showcase
                     </Link>
-                    <Link className="text-lg tracking-widest text-accent" to="/shop/name">
+                    <Link className="text-lg tracking-widest text-accent" to="/shop">
                         Shop
                     </Link>
                     <Link className="text-lg tracking-widest text-accent" to="/faq">

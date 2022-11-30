@@ -13,7 +13,6 @@ import GiftCard from "../components/cards/GiftCard";
 import LoadingBox from "../components/kits/LoadingBox";
 
 import { useDispatch } from "../hooks/useDispatch";
-import ErrorWithRedirect from "../components/kits/ErrorWithRedirect";
 
 export interface GiftScreenProps extends ComponentProps<"div"> {}
 

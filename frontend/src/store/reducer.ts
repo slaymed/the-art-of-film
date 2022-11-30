@@ -18,6 +18,8 @@ import showcasesReducer from "./showcase/reducer";
 import withdrawRequestsReducer from "./withdraw-requests/reducer";
 import giftsReducer from "./gifts/reducer";
 import settingsReducer from "./settings/reducer";
+import shopReducer from "./shop/reducer";
+import transactionsReducer from "./transactions/reducer";
 
 export default combineReducers({
     auth: authReducer,
@@ -38,4 +40,6 @@ export default combineReducers({
     withdrawRequests: withdrawRequestsReducer,
     gifts: giftsReducer,
     settings: settingsReducer,
+    shop: shopReducer,
+    transactions: transactionsReducer,
 });

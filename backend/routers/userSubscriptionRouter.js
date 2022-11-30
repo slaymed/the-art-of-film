@@ -66,7 +66,9 @@ userSubscriptionRouter.post(
             const stripe = await getStripe();
 
             const userStripeInfo = await get_or_create_user_stripe_info(user);
+            if (!userStripeInfo) throw new Error("Something went wrong");
             const customer = await get_or_create_stripe_customer(user);
+            if (!customer || customer.deleted) throw new Error("Something went wrong");
 
             const stripe_monthly_price = await stripe.prices.retrieve(targetedSub.monthly_stripe_data.price_id);
             const stripe_yearly_price = await stripe.prices.retrieve(targetedSub.yearly_stripe_data.price_id);

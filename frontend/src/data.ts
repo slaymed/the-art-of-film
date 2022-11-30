@@ -1,5 +1,3 @@
-import { GroupBase } from "react-select";
-
 const data = {
     flags: {
         GB: "https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg",
@@ -289,11 +287,10 @@ const data = {
         { value: "UK 3 Sheet", label: "UK 3 Sheet" },
         { value: "UK 6 Sheet", label: "UK 6 Sheet" },
         { value: "UK Front of House set", label: "UK Front of House set" },
-        { value: "US 1 Sheet", label: "US 1 Sheet" },
         { value: "US Halfsheet", label: "US Halfsheet" },
         { value: "US Lobby Se", label: "US Lobby Se" },
         { value: "US Insert", label: "US Insert" },
-        { value: "US Window Card", lable: "US Window Card" },
+        { value: "US Window Card", label: "US Window Card" },
         { value: "German A0", label: "German A0" },
         { value: "German A1", label: "German A1" },
         { value: "German A2", label: "German A2" },

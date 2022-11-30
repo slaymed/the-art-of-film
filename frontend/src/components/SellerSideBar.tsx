@@ -14,6 +14,7 @@ import LoadingBox from "./kits/LoadingBox";
 import SideBarLink from "./kits/SideBarLink";
 import { SelectedList } from "../screens/OrdersScreen";
 import CurrencyConvert from "./kits/CurrencyConvert";
+import { Link } from "react-router-dom";
 
 export interface SellerSideBarProps extends ComponentProps<"div"> {}
 
@@ -69,19 +70,24 @@ const SellerSideBar: FC<SellerSideBarProps> = ({ className = "", ...rest }) => {
             )}
         >
             <div className="flex flex-col p-2 bg-gradient-to-tl from-accent/5 to-accent/20">
-                <div className="flex justify-between items-center">
-                    <TextHeader className="text-xl">Available</TextHeader>
-                    <TextHeader className="text-xl">
-                        <CurrencyConvert amount={userInfo.availableBalance} />
-                    </TextHeader>
-                </div>
-                {userInfo.pendingBalance > 0 && (
+                <Link to="/transactions?pannel=payments">
                     <div className="flex justify-between items-center">
-                        <TextHeader className="text-xl">Pending</TextHeader>
+                        <TextHeader className="text-xl">Available</TextHeader>
                         <TextHeader className="text-xl">
-                            <CurrencyConvert amount={userInfo.pendingBalance} />
+                            <CurrencyConvert amount={userInfo.availableBalance} />
                         </TextHeader>
                     </div>
+                </Link>
+
+                {userInfo.pendingBalance > 0 && (
+                    <Link to="/transactions?pannel=income">
+                        <div className="flex justify-between items-center">
+                            <TextHeader className="text-xl">Pending</TextHeader>
+                            <TextHeader className="text-xl">
+                                <CurrencyConvert amount={userInfo.pendingBalance} />
+                            </TextHeader>
+                        </div>
+                    </Link>
                 )}
             </div>
 
@@ -98,6 +104,7 @@ const SellerSideBar: FC<SellerSideBarProps> = ({ className = "", ...rest }) => {
             <SideBarLink to="/my-subscription" iconClasses="fas fa-list" text="My Subscriptions" />
             <SideBarLink to="/purchaced-gifts" iconClasses="fa-solid fa-gift" text="Purchaced Gifts" />
             <SideBarLink to={`/seller/${userInfo._id}`} iconClasses="fas fa-images" text="My ShowCase" />
+            <SideBarLink to="/my-advertisements" iconClasses="fa-solid fa-heart" text="Advertisements" />
             <TextHeader className="text-xl text-tcolor">Selling</TextHeader>
             <SideBarLink
                 to={`/orders?pannel=${SelectedList.C_O}`}
@@ -111,6 +118,7 @@ const SellerSideBar: FC<SellerSideBarProps> = ({ className = "", ...rest }) => {
                 text="Purchase Orders"
             />
             <TextHeader className="text-xl text-tcolor">Payments Settings</TextHeader>
+            <SideBarLink to="/transactions" iconClasses="fa-solid fa-arrow-right-arrow-left" text="Transactions" />
             <SideBarLink to="/payment-methods" iconClasses="fas fa-credit-card" text="All Payment Methods" />
             <SideBarLink to="/payment-methods/credit-cards" iconClasses="fas fa-credit-card" text="Credit Cards" />
             <SideBarLink to="/withdraw-requests" iconClasses="fas fa-credit-card" text="Withdraw Requests" />

@@ -7,8 +7,6 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "../hooks/useDispatch";
 
 import { fetchingHomeProducts, homeProductsSelector } from "../store/products/selectors";
-import { advertisementsSelector } from "../store/advertisements/selectors";
-import { fetchAdvertisement } from "../store/advertisements/thunk";
 import { fetchHomeProducts } from "../store/products/thunks";
 import { fetchTopSellersShowcaseList } from "../store/showcase/thunks";
 import { topSellersShowcaseList } from "../store/showcase/selectors";
@@ -24,8 +22,8 @@ import SearchBox from "../components/SearchBox";
 import H1 from "../components/elements/H1";
 import TextHeader from "../components/elements/TextHeader";
 import SellerShowcaseCard from "../components/cards/SellerShowcaseCard";
-
-// TODO: Redesigned using tailwind: Remove Comment When Pushing to production
+import HomePageAdvertisementBanner from "../components/sections/ads/HomePageAdvertisementBanner";
+import CombinedAdsSection from "../components/sections/ads/CombinedAdsSection";
 
 const CarouselComponent = Carousel as any;
 
@@ -36,13 +34,11 @@ const HomeScreen: FC<HomeScreenProps> = ({ className = "", ...rest }) => {
 
     const products = useSelector(homeProductsSelector).slice(0, 6);
     const showcases = useSelector(topSellersShowcaseList);
-    const advertisements = useSelector(advertisementsSelector);
     const { loading, errors } = useSelector(fetchingHomeProducts);
 
     useEffect(() => {
         dispatch(fetchHomeProducts());
         dispatch(fetchTopSellersShowcaseList());
-        dispatch(fetchAdvertisement());
     }, [dispatch]);
 
     return (
@@ -62,6 +58,7 @@ const HomeScreen: FC<HomeScreenProps> = ({ className = "", ...rest }) => {
             </div>
 
             <WelcomeSection />
+            <HomePageAdvertisementBanner />
             <HowItWorksSection />
             <ShowcaseSection />
 
@@ -85,7 +82,7 @@ const HomeScreen: FC<HomeScreenProps> = ({ className = "", ...rest }) => {
                 ) : (
                     <>
                         {Array.isArray(products) && products.length === 0 && <MessageBox>No Posters Found</MessageBox>}
-                        <div className="flex p-8 w-full">
+                        <div className="flex px-2 sm:px-8 py-8 w-full">
                             <CarouselComponent
                                 breakPoints={[
                                     { width: 2, itemsToShow: 1 },
@@ -115,7 +112,7 @@ const HomeScreen: FC<HomeScreenProps> = ({ className = "", ...rest }) => {
                 />
             </div>
 
-            <div className="bg-light-dark flex flex-col items-center p-16 space-y-16">
+            <div className="bg-light-dark flex flex-col items-center px-2 sm:px-8 py-8 gap-16">
                 <TextHeader className="text-4xl sm:text-5xl md:text-6xl">
                     <span className="text-accent">Browse</span> Showcases
                 </TextHeader>
@@ -132,11 +129,13 @@ const HomeScreen: FC<HomeScreenProps> = ({ className = "", ...rest }) => {
                         {Array.isArray(showcases) &&
                             showcases?.map(({ seller }) => {
                                 if (!seller) return null;
-                                return <SellerShowcaseCard seller={seller} />;
+                                return <SellerShowcaseCard key={seller._id} seller={seller} />;
                             })}
                     </CarouselComponent>
                 </div>
             </div>
+
+            <CombinedAdsSection flex="row" />
         </div>
     );
 };

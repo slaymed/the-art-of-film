@@ -1,5 +1,6 @@
 import express from "express";
 import expressAsyncHandler from "express-async-handler";
+import { toFixed } from "../helpers/toFixed.js";
 
 import Cart, { defaultShippingAddress } from "../models/cartModal.js";
 import Product from "../models/productModel.js";
@@ -21,6 +22,17 @@ export const getCart = async (user) => {
     return cart;
 };
 
+export const clearCart = async (cart) => {
+    if (!cart) return;
+    cart.items = [];
+    cart.shippingAddress = defaultShippingAddress;
+    cart.itemsPrice = 0;
+    cart.totalPrice = 0;
+    cart.currentSellerId = null;
+    cart.lastPosterType = "";
+    return await cart.save();
+};
+
 const calcPrices = async (cart) => {
     let itemsPrice = 0;
     let totalPrice = 0;
@@ -31,7 +43,8 @@ const calcPrices = async (cart) => {
     for (const product of cart.items) {
         if (!product) continue;
 
-        itemsPrice += product.price;
+        const price = toFixed(product.salePrice ?? product.price);
+        itemsPrice += price;
     }
 
     const { code } = cart.shippingAddress;
@@ -40,7 +53,8 @@ const calcPrices = async (cart) => {
 
     const shippingCost = rolledFolded[cart.lastPosterType.toLowerCase()];
 
-    totalPrice = itemsPrice + (cart.items.length - 1) + shippingCost;
+    totalPrice = toFixed(itemsPrice + (cart.items.length - 1) + shippingCost);
+    itemsPrice = toFixed(itemsPrice);
 
     return { itemsPrice, totalPrice };
 };
@@ -93,7 +107,7 @@ cartRouter.post(
                     return res.status(404).json({ message: "You must only buy from one seller at a time" });
 
                 if (cart.items.find((item) => item._id.toString() === product._id.toString()))
-                    return res.status(401).json({ message: "Poster already added" });
+                    return res.status(401).json({ message: "Poster already added", redirect: "/cart" });
             }
 
             cart.items.push(product);
@@ -106,6 +120,40 @@ cartRouter.post(
             cart.totalPrice = totalPrice;
 
             return res.status(200).json(await cart.save());
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json(error);
+        }
+    })
+);
+
+cartRouter.post(
+    "/remove",
+    isAuth,
+    expressAsyncHandler(async (req, res) => {
+        try {
+            const { productId } = req.body;
+            const cart = await getCart(req.user);
+
+            if (cart.items.length === 0) return res.status(401).json({ message: "Cart Already Empty" });
+            if (cart.items.length === 1) return res.status(200).json(await clearCart(cart));
+
+            const itemsIndex = cart.items.findIndex((item) => item._id.toString() === productId);
+
+            if (itemsIndex > -1) {
+                cart.items.splice(itemsIndex, 1);
+
+                const lastProduct = cart.items[cart.items.length - 1];
+                cart.currentSellerId = lastProduct.seller.toString();
+                cart.lastPosterType = lastProduct.rolledFolded;
+                const { itemsPrice, totalPrice } = await calcPrices(cart);
+                cart.itemsPrice = itemsPrice;
+                cart.totalPrice = totalPrice;
+
+                return res.status(200).json(await cart.save());
+            }
+
+            return res.status(404).json({ message: "Product not Found in cart" });
         } catch (error) {
             console.log(error);
             return res.status(500).json(error);
@@ -137,16 +185,7 @@ cartRouter.post(
     isAuth,
     expressAsyncHandler(async (req, res) => {
         try {
-            const cart = await getCart(req.user);
-
-            cart.items = [];
-            cart.shippingAddress = defaultShippingAddress;
-            cart.itemsPrice = 0;
-            cart.totalPrice = 0;
-            cart.currentSellerId = null;
-            cart.lastPosterType = "";
-
-            return res.status(200).json(await cart.save());
+            return res.status(200).json(await clearCart(await getCart(req.user)));
         } catch (error) {
             return res.status(500).json(error);
         }

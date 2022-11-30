@@ -59,7 +59,7 @@ const Register: FC<RegisterProps> = ({ className = "", ...rest }) => {
 
         if (status === RequestLifeCycle.SUCCESS) {
             loadUserRelated(dispatch);
-            navigate("/payment-methods/credit-cards/add");
+            navigate("/payment-methods/credit-cards/add?redirect=/page/subscriptions");
         }
     };
 

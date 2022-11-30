@@ -21,5 +21,5 @@ export const CREATE_POSTER = "create";
 export const UPDATE_POSTER = "update";
 
 // Shared Operations Targeted Values
-export const FETCH_HOME_PRODUCTS_TARGETED_VALUE = "homelist";
-export const FETCH_MY_PRODUCTS_TARGETED_VALUE = "myProducts";
+export const FETCH_HOME_PRODUCTS_TARGET_VALUE = "homelist";
+export const FETCH_MY_PRODUCTS_TARGET_VALUE = "myProducts";

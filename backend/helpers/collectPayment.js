@@ -1,7 +1,7 @@
 import PaymentRecord from "../models/paymentRecordModal.js";
 import User from "../models/userModel.js";
 
-const collectPayment = async (paymentId, userId, release = false) => {
+const collectPayment = async (paymentId, userId) => {
     let user;
 
     if (userId) {
@@ -16,13 +16,17 @@ const collectPayment = async (paymentId, userId, release = false) => {
 
     const now_time = new Date().getTime();
 
-    if (!payment.collectd) {
+    if (!payment.collected) {
         payment.collected_at = now_time;
         payment.collected = true;
-    }
-    if (release) {
-        payment.released = true;
-        payment.released_at = now_time;
+
+        if (payment.to) {
+            const to = await User.findById(payment.to);
+            if (to) {
+                to.pendingBalance += payment.total_release_amount_after_fee;
+                await to.save();
+            }
+        }
     }
 
     await payment.save();

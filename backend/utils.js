@@ -54,6 +54,7 @@ export const isAuth = async (req, res, next) => {
 };
 
 export const getGiftSub = async (user) => {
+    if (!user) return null;
     const giftSub = await SubscriptionGift.findOne({ user: user._id, active: true })
         .populate({
             path: "gift",
@@ -83,7 +84,10 @@ export const giftSubValid = async (giftSub) => {
 };
 
 export const getStripeSubscription = async (user) => {
+    if (!user) return null;
     const userStripeInfo = await get_or_create_user_stripe_info(user);
+    if (!userStripeInfo) throw new Error("Something went wrong");
+    if (!userStripeInfo.sub) return null;
 
     const stripe = await getStripe();
 
@@ -107,6 +111,7 @@ export const stripeSubValid = (sub) => {
 };
 
 export const is_subscribed = async (user) => {
+    if (!user) return false;
     const giftSub = await getGiftSub(user);
     if (await giftSubValid(giftSub)) return true;
 

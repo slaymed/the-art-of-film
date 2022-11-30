@@ -2,16 +2,14 @@ import voucher from "voucher-code-generator";
 import collectPayment from "../../../../helpers/collectPayment.js";
 
 import getStripe from "../../../../helpers/get-stripe.js";
-import getSettings from "../../../../helpers/getSettings.js";
+import releasePayment from "../../../../helpers/releasePayment.js";
 import Advertise from "../../../../models/advertiseModel.js";
 import Chat from "../../../../models/chatModel.js";
 import Gift from "../../../../models/giftModal.js";
 import Order from "../../../../models/orderModel.js";
-import PaymentRecord from "../../../../models/paymentRecordModal.js";
 import Product from "../../../../models/productModel.js";
 import Session from "../../../../models/sessionModel.js";
 import Socket from "../../../../models/socketModal.js";
-import Subscription from "../../../../models/subscriptionModel.js";
 import User from "../../../../models/userModel.js";
 
 export async function paymentIntentSucceeded(event, io) {
@@ -29,9 +27,11 @@ export async function paymentIntentSucceeded(event, io) {
         session.payment_intent_id = object.id;
         await session.save();
 
+        await collectPayment(session.payment_record, session.user ? session.user : null);
+
         switch (session.type) {
             case "advertisement":
-                await collectPayment(session.payment_record, session.user ? session.user : null, true);
+                await releasePayment(session.payment_record, session.user ? session.user : null);
                 const advertise = await Advertise.findById(session.ref);
                 if (!advertise) throw new Error("Advertise Removed");
 
@@ -40,7 +40,6 @@ export async function paymentIntentSucceeded(event, io) {
                 await advertise.save();
                 break;
             case "poster":
-                await collectPayment(session.payment_record, session.user ? session.user : null);
                 const order = await Order.findById(session.ref);
                 if (!order) throw new Error("Order Removed");
 
@@ -78,10 +77,7 @@ export async function paymentIntentSucceeded(event, io) {
                 order.paidAt = new Date().getTime();
                 order.chatId = savedChat._id;
                 await order.save();
-                const savedOrder = await Order.findById(order._id)
-                    .populate("user")
-                    .populate("seller")
-                    .populate("issue");
+                const savedOrder = await Order.findById(order._id).populate("user").populate("seller");
 
                 for (const socket of await Socket.find({ user: order.seller._id })) {
                     if (io.sockets.sockets.has(socket.socketId)) {
@@ -94,7 +90,7 @@ export async function paymentIntentSucceeded(event, io) {
 
                 break;
             case "gift":
-                await collectPayment(session.payment_record, session.user ? session.user : null, true);
+                await releasePayment(session.payment_record, session.user ? session.user : null);
                 const gift = await Gift.findById(session.ref).populate("buyer");
                 if (!gift) throw new Error("Gift not found");
 
@@ -128,6 +124,6 @@ export async function paymentIntentSucceeded(event, io) {
         if (!session) return { success: false, message: error.message, detail: "Failed In Payment Intent Succeeded" };
         const stripe = await getStripe();
         await stripe.refunds.create({ payment_intent: session.payment_intent_id });
-        return { success: false, message: error.message, detail: "Refund Payment" };
+        return { success: false, message: error.message, detail: "Payment Refund" };
     }
 }

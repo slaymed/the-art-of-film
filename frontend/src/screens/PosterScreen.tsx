@@ -5,11 +5,13 @@ import { useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import { fetchingSelectedProduct, selectedProductSelector } from "../store/products/selectors";
 import { useDispatch } from "../hooks/useDispatch";
-import { fetchProduct } from "../store/products/thunks";
+import { fetchSelectedProduct } from "../store/products/thunks";
 import LoadingBox from "../components/kits/LoadingBox";
 import ErrorWithRedirect from "../components/kits/ErrorWithRedirect";
 import Paragraph from "../components/elements/Paragraph";
 import ProductPage from "../components/pages/products/ProductPage";
+import { user } from "../store/auth/selectors";
+import { getPosterSellerId } from "../helpers/get-seller";
 
 export interface PosterScreenProps extends ComponentProps<"div"> {}
 
@@ -18,12 +20,15 @@ const PosterScreen: FC<PosterScreenProps> = ({ className = "", ...rest }) => {
 
     const { posterId } = useParams();
 
+    const userInfo = useSelector(user);
     const poster = useSelector(selectedProductSelector);
     const fetching = useSelector(fetchingSelectedProduct);
 
     useEffect(() => {
-        if (posterId) dispatch(fetchProduct(posterId));
-    }, [dispatch]);
+        if (posterId) dispatch(fetchSelectedProduct(posterId));
+    }, [dispatch, posterId]);
+
+    const sellerId = getPosterSellerId(poster);
 
     return (
         <div
@@ -32,7 +37,7 @@ const PosterScreen: FC<PosterScreenProps> = ({ className = "", ...rest }) => {
         >
             <div className="flex items-center justify-between space-x-4">
                 <TextHeader className="text-3xl sm:text-5xl text-accent">Poster Screen</TextHeader>
-                {poster && (
+                {poster && !poster.sold && userInfo && sellerId === userInfo._id && (
                     <Link to={`/posters/${poster._id}/edit`}>
                         <Paragraph className="text-accent text-sm sm:text-lg underline underline-offset-2">
                             Edit

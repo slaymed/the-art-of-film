@@ -21,7 +21,7 @@ const SellerShowcasePage: FC<SellerShowcasePageProps> = ({ className = "", showc
 
     const product = useSelector(selectedShowcaseProduct);
 
-    useEffect(() => dispatch(selectShowcaseProduct(null)), []);
+    useEffect(() => () => dispatch(selectShowcaseProduct(null)), [dispatch]);
 
     return (
         <div {...rest} className={classNames("w-full flex flex-col gap-8 sm:gap-16", { [className]: className })}>

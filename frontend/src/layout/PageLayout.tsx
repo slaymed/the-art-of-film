@@ -20,7 +20,7 @@ const PageLayout: FC<PageLayoutProps> = ({ className = "", children, ...rest }) 
                 <div className="hidden lg:block h-full bg-base sticky top-top-nav">
                     <SellerSideBar />
                 </div>
-                <div className="w-full flex-1 bg-light-dark pt-10 lg:pt-0">{children}</div>
+                <div className="w-full flex-1 bg-light-dark">{children}</div>
             </div>
             <div
                 className={classNames("lg:hidden bg-base duration-200 left-0 fixed top-top-nav h-screen-top-nav-less", {

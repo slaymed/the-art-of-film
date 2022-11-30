@@ -11,9 +11,10 @@ import Message from "../models/messageModal.js";
 import Socket from "../models/socketModal.js";
 import getStripe from "../helpers/get-stripe.js";
 import getSettings from "../helpers/getSettings.js";
-import UserStripeInfo from "../models/userStripeInfoModal.js";
 import get_or_create_stripe_customer from "../helpers/get-or-create-stripe-customer.js";
 import PaymentRecord from "../models/paymentRecordModal.js";
+import releasePayment from "../helpers/releasePayment.js";
+import { toFixed } from "../helpers/toFixed.js";
 
 const orderRouter = express.Router();
 
@@ -72,11 +73,13 @@ orderRouter.post(
                 if (product.sold)
                     return res.status(401).json({ message: `Poster ${product.name} has been already sold.` });
 
+                const price = product.salePrice ?? product.price;
+
                 orderItems.push({
                     name: product.name,
                     qty: 1,
                     image: product.image,
-                    price: product.price,
+                    price: price,
                     product: product._id,
                 });
             }
@@ -86,10 +89,10 @@ orderRouter.post(
                 orderItems,
                 shippingAddress: cart.shippingAddress,
                 paymentMethod: cart.paymentMethod,
-                itemsPrice: cart.itemsPrice,
-                shippingCost: cart.totalPrice - cart.itemsPrice,
+                itemsPrice: toFixed(cart.itemsPrice),
+                shippingCost: toFixed(cart.totalPrice - cart.itemsPrice),
                 taxPrice: 0,
-                totalPrice: cart.totalPrice,
+                totalPrice: toFixed(cart.totalPrice),
                 allowedToPay: true,
                 user: req.user._id,
             });
@@ -228,14 +231,8 @@ orderRouter.post(
             order.recievedAt = new Date().getTime();
             const savedOrder = await order.save();
 
-            const seller = await User.findById(order.seller._id);
-            if (seller) {
-                // FIXME:
-                const price_after_commission = (savedOrder.totalPrice * (100 - savedOrder.commission_percentage)) / 100;
-                seller.pendingBalance -= price_after_commission;
-                seller.availableBalance += price_after_commission;
-                await seller.save();
-            }
+            const payment = await PaymentRecord.findById(savedOrder.payment_record);
+            if (payment) await releasePayment(payment, order.user._id);
 
             const chat = await Chat.findById(order.chatId).populate("messages");
             if (!chat) return res.status(200).json(savedOrder);
@@ -318,11 +315,12 @@ orderRouter.post(
             const stripe = await getStripe();
 
             const customer = await get_or_create_stripe_customer(req.user);
+            if (!customer || customer.deleted) throw new Error("Something went wrong");
 
             const session = await stripe.checkout.sessions.create({
                 line_items: [
                     {
-                        price_data: { currency: "GBP", product_data, unit_amount: order.totalPrice * 100 },
+                        price_data: { currency: "GBP", product_data, unit_amount: Math.round(order.totalPrice * 100) },
                         quantity: 1,
                     },
                 ],
@@ -354,7 +352,7 @@ orderRouter.post(
 
             const { commission_percentage_on_sold_posters } = await getSettings();
 
-            const total_commission_fee = (order.totalPrice * commission_percentage_on_sold_posters) / 100;
+            const total_commission_fee = toFixed((order.totalPrice * commission_percentage_on_sold_posters) / 100);
 
             await PaymentRecord.deleteMany({ ref: orderId, status: "pending", collected: false });
             const orderPayment = await new PaymentRecord({
@@ -363,13 +361,13 @@ orderRouter.post(
                 total_collected_amount: order.totalPrice,
                 commission_percentage: commission_percentage_on_sold_posters,
                 total_commission_fee,
-                total_release_amount_after_fee: order.totalPrice - total_commission_fee,
+                total_release_amount_after_fee: toFixed(order.totalPrice - total_commission_fee),
                 session: new_session._id,
                 type: "order",
                 ref: order._id.toString(),
             }).save();
 
-            order.payment_record = advertisePayment._id;
+            order.payment_record = orderPayment._id;
             await order.save();
             new_session.payment_record = orderPayment._id;
 
@@ -402,17 +400,12 @@ export const autoReleaseOrders = async () => {
             order.recievedAt = now_time;
             const savedOrder = await order.save();
 
-            const seller = await User.findById(savedOrder.seller);
-            if (seller) {
-                seller.pendingBalance -= order.totalPrice;
-                seller.availableBalance += order.totalPrice;
-
-                await seller.save();
-            }
+            const payment = await PaymentRecord.findById(savedOrder.payment_record);
+            if (payment) await releasePayment(payment, savedOrder.user._id);
         }
     } catch (error) {}
 };
 
-setInterval(autoReleaseOrders, 1 * 1000);
+setInterval(autoReleaseOrders, 1000 * 60 * 60 * 24);
 
 export default orderRouter;

@@ -29,6 +29,7 @@ import tagsRouter from "./routers/tagsRouter.js";
 import sellerShowcaseRouter from "./routers/sellerShowcaseRouter.js";
 import withdrawRequestsRouter from "./routers/withdrawRequestsRouter.js";
 import settingsRouter from "./routers/settingsRouter.js";
+import paymentRecordRouter from "./routers/paymentRecordRouter.js";
 
 dotenv.config();
 
@@ -72,6 +73,7 @@ app.use("/api/advertise", advertiseRouter);
 app.use("/api/globals", globalRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/chat", chatRouter);
+app.use("/api/payment-records", paymentRecordRouter);
 
 app.get("/api/config/paypal", (req, res) => {
     res.send(process.env.PAYPAL_CLIENT_ID || "sb");

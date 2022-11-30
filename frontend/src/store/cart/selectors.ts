@@ -22,15 +22,23 @@ export const addingToCart = createSelector(
     (state: RootState) => state.cart.adding,
     (adding: GlobalOperation) => adding
 );
+
 export const updatingCart = createSelector(
     (state: RootState) => state.cart.updating,
     (updating: GlobalOperation) => updating
 );
+
 export const fetchingCart = createSelector(
     (state: RootState) => state.cart.fetching,
     (fetching: GlobalOperation) => fetching
 );
+
 export const clearingCart = createSelector(
     (state: RootState) => state.cart.clearing,
     (clearing: GlobalOperation) => clearing
+);
+
+export const removingFromCart = createSelector(
+    (state: RootState) => state.cart.removing,
+    (removing: GlobalOperation) => removing
 );

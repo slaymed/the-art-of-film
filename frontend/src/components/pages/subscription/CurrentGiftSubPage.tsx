@@ -24,7 +24,7 @@ const CurrentGiftSubPage: FC<CurrentGiftSubPageProps> = ({ className = "", giftS
     return (
         <div {...rest} className={classNames("flex flex-col gap-8", { [className]: className })}>
             <div className="flex items-center justify-between flex-wrap">
-                <Paragraph className="text-accent text-lg sm:text-xl font-bold tracking-widest uppercase">
+                <Paragraph className="text-slate-400 text-lg sm:text-xl font-bold tracking-widest uppercase">
                     Current Subscription
                 </Paragraph>
                 <RefetchButton onClick={refetch} />

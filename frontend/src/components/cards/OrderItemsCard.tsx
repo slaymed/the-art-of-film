@@ -44,11 +44,11 @@ const OrderItemsCard: FC<OrderItemsCardProps> = ({ className = "", items = [], .
                             <Paragraph>1</Paragraph>
                             <Paragraph>x</Paragraph>
                             <Paragraph>
-                                <CurrencyConvert amount={item.price} />
+                                <CurrencyConvert amount={item["salePrice"] ?? item.price} />
                             </Paragraph>
                             <Paragraph>=</Paragraph>
                             <Paragraph>
-                                <CurrencyConvert amount={item.price} />
+                                <CurrencyConvert amount={item["salePrice"] ?? item.price} />
                             </Paragraph>
                         </div>
                     </div>

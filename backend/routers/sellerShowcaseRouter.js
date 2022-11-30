@@ -58,7 +58,7 @@ sellerShowcaseRouter.get(
     "/list/top",
     expressAsyncHandler(async (_, res) => {
         try {
-            const topSellers = await User.find().sort({ "seller.rating": -1 });
+            const topSellers = await User.find().sort({ rating: -1, name: 1 });
 
             const showcaseList = [];
 
@@ -81,11 +81,11 @@ sellerShowcaseRouter.get(
     "/list",
     expressAsyncHandler(async (_, res) => {
         try {
-            const topSellers = await User.find();
+            const sellers = await User.find().sort({ name: 1 });
 
             const showcaseList = [];
 
-            for (const seller of topSellers) {
+            for (const seller of sellers) {
                 const subscribed = await is_subscribed(seller);
                 const count = await Product.find({ seller: seller._id, visible: true }).count();
                 if (subscribed && count > 0) showcaseList.push({ seller });

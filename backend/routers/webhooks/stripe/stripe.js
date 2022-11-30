@@ -8,7 +8,7 @@ import { paymentIntentSucceeded } from "./lifecycle/payment-intent-succeeded.js"
 
 const stripeWebhooksRouter = express.Router();
 
-const webhookSignitorSecret = "whsec_19498ecb811450df85410489f470f4bc40c5de148085edffaf53ba700d96f903";
+const webhookSignitorSecret = "whsec_2bdd31c11b32714e4e4058daa5f0e8c778c9fee4e85833104ac620e2d9d03b42";
 
 stripeWebhooksRouter.post(
     "/",

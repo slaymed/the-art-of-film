@@ -1,14 +1,16 @@
 import React, { FC, ComponentProps } from "react";
 import classNames from "classnames";
+import { Link, useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+
+import { AdvertisementType } from "../store/advertisements/enums";
+import { fetchingAdvertisements, selectAdvertiseById, syncingAdvertisement } from "../store/advertisements/selectors";
+
 import Page from "../components/pages/Page";
 import TextHeader from "../components/elements/TextHeader";
-import { Link, useParams } from "react-router-dom";
-import { fetchingAdvertisements, selectAdvertiseById, syncingAdvertisement } from "../store/advertisements/selectors";
-import { useSelector } from "react-redux";
 import LoadingBox from "../components/kits/LoadingBox";
 import MessageBox from "../components/kits/MessageBox";
 import Paragraph from "../components/elements/Paragraph";
-import { AdvertisementType } from "../store/advertisements/enums";
 import AdvertorialPage from "../components/pages/advertise/AdvertorialPage";
 import SponsoredLinkPage from "../components/pages/advertise/SponsoredLinkPage";
 import AdvertisementBannerPage from "../components/pages/advertise/AdvertisementBannerPage";
@@ -29,10 +31,10 @@ const AdvertisementScreen: FC<AdvertisementScreenProps> = ({ className = "", ...
             </Page>
         );
 
-    if (fetching.errors.message || syncing.errors.message)
+    if (fetching.errors.message)
         return (
             <Page>
-                <MessageBox>{fetching.errors.message || syncing.errors.message}</MessageBox>
+                <MessageBox>{fetching.errors.message}</MessageBox>
             </Page>
         );
 
@@ -47,7 +49,27 @@ const AdvertisementScreen: FC<AdvertisementScreenProps> = ({ className = "", ...
         <Page {...rest} className={classNames("", { [className]: className })}>
             <div className="container mx-auto flex flex-col gap-8">
                 <div className="flex flex-wrap items-center justify-between gap-4">
-                    <TextHeader className="text-3xl text-accent">{advertisement.title}</TextHeader>
+                    <div className="flex flex-wrap gap-4 items-center">
+                        <TextHeader className="text-3xl line-clamp-1 hover:line-clamp-none text-accent">
+                            {advertisement.title}
+                        </TextHeader>
+                        <Paragraph
+                            className={classNames("rounded font-bold tracking-widest text-sm py-0.5 px-2", {
+                                "bg-slate-400/20 text-slate-400": advertisement.type !== AdvertisementType.ADVERTORIAL,
+                                "bg-accent/20 text-accent": advertisement.type === AdvertisementType.ADVERTORIAL,
+                            })}
+                        >
+                            {advertisement.type === AdvertisementType.ADVERTORIAL && (
+                                <Link to={`/advertorial/${advertisement._id}`}>
+                                    <Paragraph className="text-sm line-clamp-1 underline-offset-2 underline">
+                                        See Public Advertorial Page
+                                    </Paragraph>
+                                </Link>
+                            )}
+                            {advertisement.type === AdvertisementType.SPONSOR && "Sponsored Link"}
+                            {advertisement.type === AdvertisementType.BANNER && "Home Page Banner"}
+                        </Paragraph>
+                    </div>
                     <Link to={`/edit-advertisement/${advertisement._id}`}>
                         <Paragraph className="text-accent text-sm underline underline-offset-2">Edit</Paragraph>
                     </Link>
@@ -62,12 +84,6 @@ const AdvertisementScreen: FC<AdvertisementScreenProps> = ({ className = "", ...
                 {advertisement.type === AdvertisementType.BANNER && (
                     <AdvertisementBannerPage advertisement={advertisement} showTitle={false} />
                 )}
-
-                <Link to={`/advertisement-transaction/${advertisement._id}`}>
-                    <Paragraph className="text-accent underline underline-offset-2 font-bold text-sm tracking-widest">
-                        Advertisement Transaction
-                    </Paragraph>
-                </Link>
             </div>
         </Page>
     );

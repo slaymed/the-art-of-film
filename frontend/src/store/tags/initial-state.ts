@@ -1,4 +1,4 @@
-import { LazyOperationInitialState, OperationInitialState } from "../initial-state";
+import { LazyOperationInitialState } from "../initial-state";
 import { ITagsState } from "./types";
 
 export const TagsInitialState: ITagsState = {

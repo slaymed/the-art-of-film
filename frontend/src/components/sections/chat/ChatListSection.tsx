@@ -1,4 +1,4 @@
-import React, { FC, ComponentProps, useMemo, useCallback, memo, useEffect } from "react";
+import React, { FC, ComponentProps, useMemo, memo, useEffect } from "react";
 import classNames from "classnames";
 import { useSelector } from "react-redux";
 
@@ -44,7 +44,7 @@ const ChatListSection: FC<ChatListSectionProps> = ({ className = "", ...rest }) 
 
     useEffect(() => {
         dispatch(selectChatList(pannel));
-    }, [pannel]);
+    }, [pannel, dispatch]);
 
     return (
         <div

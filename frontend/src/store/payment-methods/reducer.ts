@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import { globalMessage } from "../initial-state";
-import { GlobalMessage, ThunkResponseType } from "../types";
+import { ThunkResponseType } from "../types";
 import { PaymentMethodsInitialState } from "./initial-state";
 import { creditCardsSharedOperations } from "./shared-operations";
 import { CreditCardErrors, ICreditCard } from "./types";

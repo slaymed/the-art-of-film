@@ -26,12 +26,9 @@ import { countrySelectDefaultOption, countrySelectOptions } from "../data";
 export interface ProfileScreenProps extends ComponentProps<"div"> {}
 
 const intialState: UpdateUserVars = {
-    email: "",
     logo: "",
     name: "",
-    password: "",
     description: "",
-    confirm_pasword: "",
     sellerName: "",
     address: "",
     city: "",
@@ -74,9 +71,6 @@ const ProfileScreen: FC<ProfileScreenProps> = ({ className = "", ...rest }) => {
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-
-        if (vars.password !== vars.confirm_pasword) return alert("Password Must Match");
-
         dispatch(updateProfile(vars));
     };
 
@@ -100,42 +94,6 @@ const ProfileScreen: FC<ProfileScreenProps> = ({ className = "", ...rest }) => {
                             name="name"
                             placeholder="Enter Name"
                             value={vars.name}
-                            onChange={handleChange}
-                        />
-                    </div>
-
-                    <div className="flex flex-col">
-                        <label htmlFor="email">Email address</label>
-                        <AppInput
-                            type="email"
-                            id="email"
-                            name="email"
-                            placeholder="Enter email"
-                            value={vars.email}
-                            onChange={handleChange}
-                        />
-                    </div>
-
-                    <div className="flex flex-col">
-                        <label htmlFor="password">Password</label>
-                        <AppInput
-                            type="password"
-                            id="password"
-                            name="password"
-                            placeholder="Enter Password"
-                            value={vars.password}
-                            onChange={handleChange}
-                        />
-                    </div>
-
-                    <div className="flex flex-col">
-                        <label htmlFor="confirm_pasword">Confirm Password</label>
-                        <AppInput
-                            type="password"
-                            id="confirm_pasword"
-                            name="confirm_pasword"
-                            placeholder="Confirm Password"
-                            value={vars.confirm_pasword}
                             onChange={handleChange}
                         />
                     </div>
@@ -186,7 +144,7 @@ const ProfileScreen: FC<ProfileScreenProps> = ({ className = "", ...rest }) => {
                         </div>
                         {vars.logo && (
                             <div className="w-full max-w-[120px]">
-                                <img src={vars.logo} className="w-full max-h-[120px] object-cover" />
+                                <img src={vars.logo} alt="Profile" className="w-full max-h-[120px] object-cover" />
                             </div>
                         )}
                     </div>

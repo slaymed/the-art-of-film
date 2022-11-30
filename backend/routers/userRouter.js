@@ -9,9 +9,7 @@ import crypto from "crypto";
 import { sendResetPasswordEmail } from "../helpers/mail.js";
 import Cart from "../models/cartModal.js";
 import Socket from "../models/socketModal.js";
-import getStripe from "../helpers/get-stripe.js";
-import UserStripeInfo from "../models/userStripeInfoModal.js";
-import create_stripe_customer from "../helpers/create_stripe_customer.js";
+
 import get_or_create_user_stripe_info from "../helpers/get_or_create_user_stripe_info.js";
 
 const userRouter = express.Router();
@@ -109,9 +107,7 @@ userRouter.post(
         try {
             const {
                 name,
-                password,
                 sellerName,
-                email,
                 logo,
                 description,
                 address,
@@ -124,21 +120,21 @@ userRouter.post(
 
             const user = await User.findById(req.user._id);
 
-            if (name) user.name = name;
-            if (password) user.password = bcrypt.hashSync(password, 8);
-            if (sellerName) user.sellerName = sellerName;
-            if (email) user.email = email;
-            if (logo) user.logo = logo;
-            if (description) user.description = description;
-            if (address) user.address = address;
-            if (city) user.city = city;
-            if (country) user.country = country;
-            if (code) user.code = code;
-            if (postalCode) user.postalCode = postalCode;
-            if (rolled_folded_shipping_cost) user.rolled_folded_shipping_cost = rolled_folded_shipping_cost;
+            if (name && user.name !== name) user.name = name;
+            if (sellerName && user.sellerName !== sellerName) user.sellerName = sellerName;
+            if (logo && user.logo !== logo) user.logo = logo;
+            if (description && user.description !== description) user.description = description;
+            if (address && user.address !== address) user.address = address;
+            if (city && user.city !== city) user.city = city;
+            if (country && user.country !== country) user.country = country;
+            if (code && user.code !== code) user.code = code;
+            if (postalCode && user.postalCode !== postalCode) user.postalCode = postalCode;
+            if (rolled_folded_shipping_cost && user.rolled_folded_shipping_cost !== rolled_folded_shipping_cost)
+                user.rolled_folded_shipping_cost = rolled_folded_shipping_cost;
 
             return res.status(200).json(await user.save());
         } catch (error) {
+            console.log(error);
             return res.status(500).json(error);
         }
     })
@@ -158,18 +154,20 @@ userRouter.post(
                 sellerName: req.body.sellerName,
             });
 
+            const userStripeInfo = await get_or_create_user_stripe_info(user);
+            if (!userStripeInfo) throw new Error("Something went wrong");
+
             const cart = new Cart({
                 items: [],
                 user: user._id,
             });
 
-            user.cart = cart._id;
-
             await cart.save();
 
-            const createdUser = await user.save();
+            user.cart = cart._id;
+            await user.save();
 
-            await get_or_create_user_stripe_info(user);
+            const createdUser = await user.save();
 
             const token = generateToken(createdUser._id.toString());
 

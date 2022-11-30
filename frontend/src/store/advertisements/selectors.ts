@@ -33,3 +33,33 @@ export const selectAdvertiseById = (id?: string) =>
         (state: RootState) => state.advertisements.list.find((ad) => ad._id === id),
         (advertisement?: Advertisement) => advertisement
     );
+
+export const homeScreenAdvertisementBanner = createSelector(
+    (state: RootState) => state.advertisements.homeScreenBanner,
+    (advertisement: Advertisement | null) => advertisement
+);
+
+export const fetchingHomeScreenAdvertisementBanner = createSelector(
+    (state: RootState) => state.advertisements.fetchingHomeScreenBanner,
+    (fetchingHomeScreenBanner: AdvertiseOperation) => fetchingHomeScreenBanner
+);
+
+export const visibleSponsoredLinks = createSelector(
+    (state: RootState) => state.advertisements.visibleSponsoredLinks,
+    (visibleSponsoredLinks: Advertisement[]) => visibleSponsoredLinks
+);
+
+export const fetchingVisibleSponsoredLinks = createSelector(
+    (state: RootState) => state.advertisements.fetchingVisibleSponsoredLinks,
+    (fetchingVisibleSponsoredLinks: AdvertiseOperation) => fetchingVisibleSponsoredLinks
+);
+
+export const visibleAdvertorials = createSelector(
+    (state: RootState) => state.advertisements.visibleAdvertorials,
+    (visibleAdvertorials: Advertisement[]) => visibleAdvertorials
+);
+
+export const fetchingVisibleAdvertorials = createSelector(
+    (state: RootState) => state.advertisements.fetchingVisibleAdvertorials,
+    (fetchingVisibleAdvertorials: AdvertiseOperation) => fetchingVisibleAdvertorials
+);

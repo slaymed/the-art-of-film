@@ -3,6 +3,7 @@ import classNames from "classnames";
 import ShowcaseCard from "../components/cards/ShowcaseCard";
 import SectionCard from "../components/cards/SectionCard";
 import GrahamGalleryPage from "../components/pages/GrahamGalleryPage";
+import CombinedAdsSection from "../components/sections/ads/CombinedAdsSection";
 
 export interface GrahamHumpreysProps extends ComponentProps<"div"> {}
 
@@ -25,7 +26,9 @@ const GrahamHumpreys: FC<GrahamHumpreysProps> = ({ className = "", ...rest }) =>
                 />
             </div>
 
-            <div className="bg-light-dark p-8 flex items-center justify-center">
+            <CombinedAdsSection flex="row" className="bg-light-dark" />
+
+            <div className="p-8 flex items-center justify-center">
                 <div className="container">
                     <SectionCard
                         before="The Graham Humphreys"
@@ -39,7 +42,9 @@ const GrahamHumpreys: FC<GrahamHumpreysProps> = ({ className = "", ...rest }) =>
                 </div>
             </div>
 
-            <GrahamGalleryPage />
+            <div className="bg-light-dark">
+                <GrahamGalleryPage />
+            </div>
         </div>
     );
 };

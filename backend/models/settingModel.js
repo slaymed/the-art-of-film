@@ -13,6 +13,7 @@ const settingSchema = new mongoose.Schema(
         sponsor_price_for_day: { type: Number, default: 0.8 },
         banner_price_for_day: { type: Number, default: 1.25 },
         advertorial_price_for_day: { type: Number, default: 2 },
+        ads_duration: { type: Number, default: 1000 * 60 * 3 },
     },
     {
         timestamps: true,

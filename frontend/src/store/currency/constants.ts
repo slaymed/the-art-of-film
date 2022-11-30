@@ -9,3 +9,6 @@ export const GBP = "GBP";
 export const USD = "USD";
 export const EUR = "EUR";
 export const JPY = "JPY";
+
+// Local Storage Keys
+export const CURRENCY_LS_KEY = "current_currency";

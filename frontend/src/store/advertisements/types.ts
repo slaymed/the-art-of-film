@@ -1,5 +1,6 @@
 import { User } from "../auth/types";
 import { GlobalOperation } from "../types";
+import { FETCH_VISIBLE_ADVERTORIALS, FETCH_VISIBLE_SPONSORED_LINKS } from "./constants";
 import { AdvertisementType } from "./enums";
 
 export type Advertisement = {
@@ -12,7 +13,7 @@ export type Advertisement = {
     paragraphs: string[];
     images: string[];
     activated_at: number | null;
-    user: User | null;
+    user: string | User | null;
     period_time: number;
     payment_record: string;
     approved: boolean;
@@ -31,7 +32,7 @@ export type CreateEditAdvertiseVars = Partial<{
     private_key: string;
 }>;
 
-export type CreateEditAdvertiseErrors = Partial<{
+export type AdvertisementOperationErrors = Partial<{
     title: string;
     image: string;
     link: string;
@@ -41,7 +42,7 @@ export type CreateEditAdvertiseErrors = Partial<{
 
 export type AdvertiseOperation = {
     loading: boolean;
-    errors: CreateEditAdvertiseErrors;
+    errors: AdvertisementOperationErrors;
 };
 
 export interface IAdvertisementState {
@@ -50,4 +51,13 @@ export interface IAdvertisementState {
     update: AdvertiseOperation;
     sync: AdvertiseOperation;
     list: Advertisement[];
+    homeScreenBanner: Advertisement | null;
+    fetchingHomeScreenBanner: AdvertiseOperation;
+    visibleSponsoredLinks: Advertisement[];
+    fetchingVisibleSponsoredLinks: AdvertiseOperation;
+    visibleAdvertorials: Advertisement[];
+    fetchingVisibleAdvertorials: AdvertiseOperation;
+    adsLastFetch: number | null;
+    adsCacheDuration: number;
+    cashed: string[];
 }

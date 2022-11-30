@@ -22,7 +22,11 @@ const ImagePreviewCard: FC<ImagePreviewCardProps> = ({
                 [className]: className,
             })}
         >
-            <img src={image} className={classNames("w-full object-contain", { [imageClasses]: imageClasses })} />
+            <img
+                src={image}
+                alt="Preview"
+                className={classNames("w-full object-contain", { [imageClasses]: imageClasses })}
+            />
             {onDelete && (
                 <div className="opacity-0 hover:opacity-100 absolute inset-0 flex justify-center items-center bg-black/60 duration-300">
                     <Button type="button" onClick={onDelete} className="text-red-500">

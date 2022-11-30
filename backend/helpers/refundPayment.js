@@ -14,16 +14,33 @@ const refundPayment = async (paymentId, userId) => {
 
     if (user && payment.by && payment.by._id.toString() !== user._id.toString()) throw new Error("Unauthorized");
 
+    if (!payment.collected) throw new Error("Unauthorized");
+
     const now_time = new Date().getTime();
+
+    let to;
+
+    if (payment.to) {
+        to = await User.findById(payment.to);
+    }
 
     if (!payment.refunded) {
         payment.refunded = true;
         payment.refunded_at = now_time;
+
+        if (to) {
+            if (!payment.released) {
+                to.pendingBalance -= payment.total_release_amount_after_fee;
+                await to.save();
+            }
+            if (payment.released) {
+                to.availableBalance -= payment.total_release_amount_after_fee;
+                await to.save();
+            }
+        }
     }
 
-    await payment.save();
-
-    return payment;
+    return await payment.save();
 };
 
 export default refundPayment;

@@ -3,7 +3,6 @@ import expressAsyncHandler from "express-async-handler";
 import get_or_create_stripe_customer from "../helpers/get-or-create-stripe-customer.js";
 
 import getStripe from "../helpers/get-stripe.js";
-import getSettings from "../helpers/getSettings.js";
 import Gift from "../models/giftModal.js";
 import PaymentRecord from "../models/paymentRecordModal.js";
 import Session from "../models/sessionModel.js";
@@ -94,11 +93,12 @@ giftsRouter.post(
             const price = gift.period === "year" ? targeted_sub.yearPrice : targeted_sub.monthPrice;
 
             const customer = await get_or_create_stripe_customer(req.user);
+            if (!customer || customer.deleted) throw new Error("Something went wrong");
 
             const session = await stripe.checkout.sessions.create({
                 line_items: [
                     {
-                        price_data: { currency: "GBP", product_data, unit_amount: price * 100 },
+                        price_data: { currency: "GBP", product_data, unit_amount: Math.round(price * 100) },
                         quantity: 1,
                     },
                 ],
@@ -141,12 +141,13 @@ giftsRouter.post(
                 ref: gift._id.toString(),
             }).save();
 
-            gift.payment_record = advertisePayment._id;
+            gift.payment_record = giftPayment._id;
             await gift.save();
             new_session.payment_record = giftPayment._id;
 
             return res.status(200).json(await new_session.save());
         } catch (error) {
+            console.log(error);
             return res.status(500).json(error);
         }
     })

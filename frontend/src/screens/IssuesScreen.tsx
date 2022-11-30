@@ -1,15 +1,17 @@
 import React, { FC, ComponentProps, useEffect } from "react";
 import classNames from "classnames";
-import Paragraph from "../components/elements/Paragraph";
 import { Link, useParams } from "react-router-dom";
-import Button from "../components/elements/Button";
 import { useSelector } from "react-redux";
-import { fetchingIssues, issuesList } from "../store/issues/selectors";
+
+import Paragraph from "../components/elements/Paragraph";
 import ErrorWithRedirect from "../components/kits/ErrorWithRedirect";
 import LoadingBox from "../components/kits/LoadingBox";
-import { useDispatch } from "../hooks/useDispatch";
-import { fetchIssues } from "../store/issues/thunks";
 import IssueCard from "../components/cards/IssueCard";
+
+import { fetchingIssues, issuesList } from "../store/issues/selectors";
+import { fetchIssues } from "../store/issues/thunks";
+
+import { useDispatch } from "../hooks/useDispatch";
 
 export interface IssuesScreenProps extends ComponentProps<"div"> {}
 
@@ -23,7 +25,7 @@ const IssuesScreen: FC<IssuesScreenProps> = ({ className = "", ...rest }) => {
 
     useEffect(() => {
         if (orderId) dispatch(fetchIssues(orderId));
-    }, [orderId]);
+    }, [orderId, dispatch]);
 
     return (
         <div

@@ -67,6 +67,17 @@ input {
     letter-spacing: 1.2px;
 }
 
+select {
+    font-family: "Bebas Neue", "Times New Roman";
+    letter-spacing: 1.5px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+option {
+    font-size: 18px;
+}
+
 .multi-select {
     border-radius: 0 !important;
     font-family: "Bebas Neue", "Poppins" !important;

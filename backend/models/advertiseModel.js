@@ -19,6 +19,9 @@ const advertiseSchema = new mongoose.Schema(
         period_time: { type: Number, required: true },
         payment_record: { type: mongoose.Schema.Types.ObjectId, ref: "PaymentRecord" },
         approved: { type: Boolean, default: true },
+        show_until: { type: Number, default: null },
+        inQueue: { type: Boolean, default: true },
+        visible: { type: Boolean, default: false },
     },
     {
         timestamps: true,
@@ -28,7 +31,9 @@ const Advertise = mongoose.model("Advertise", advertiseSchema);
 
 advertiseSchema.set("toJSON", {
     transform: (doc, advertise, options) => {
-        delete advertise.user;
+        delete advertise.show_until;
+        delete advertise.inQueue;
+        delete advertise.visible;
 
         if (advertise.type !== "advertorial") {
             delete advertise.paragraphs;

@@ -3,6 +3,7 @@ import Advertise from "../../../../models/advertiseModel.js";
 import Chat from "../../../../models/chatModel.js";
 import Gift from "../../../../models/giftModal.js";
 import Order from "../../../../models/orderModel.js";
+import Product from "../../../../models/productModel.js";
 import Session from "../../../../models/sessionModel.js";
 import Socket from "../../../../models/socketModal.js";
 import User from "../../../../models/userModel.js";
@@ -39,10 +40,12 @@ export async function chargeRefunded(event, io) {
                     const chat = await Chat.findById(order.chatId);
                     if (chat) await chat.remove();
 
-                    const seller = await User.findById(order.seller);
-                    if (seller) {
-                        seller.pendingBalance -= order.totalPrice;
-                        await seller.save();
+                    for (const item of order.orderItems) {
+                        const product = await Product.findById(item.product);
+                        if (product && product.sold) {
+                            product.sold = false;
+                            await product.save();
+                        }
                     }
 
                     for (const socket of await Socket.find({ user: order.seller })) {

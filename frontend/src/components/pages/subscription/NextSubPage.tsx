@@ -18,7 +18,7 @@ const NextSubPage: FC<NextSubPageProps> = ({ className = "", next_sub_data, ...r
 
     return (
         <div {...rest} className={classNames("flex flex-col space-y-4", { [className]: className })}>
-            <Paragraph className="text-accent text-lg sm:text-xl font-bold tracking-widest uppercase">
+            <Paragraph className="text-slate-400 text-lg sm:text-xl font-bold tracking-widest uppercase">
                 Moving To
             </Paragraph>
             <div className="flex gap-4 items-center flex-wrap">

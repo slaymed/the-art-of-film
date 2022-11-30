@@ -15,6 +15,7 @@ import { fetchAuthenticatedUser } from "./store/auth/thunks";
 import { fetchAvailableSubscriptions } from "./store/subscription/thunks";
 import { fetchRates } from "./store/currency/thunks";
 import { fetchWebsiteSettings } from "./store/settings/thunks";
+import { fetchAdvertisement, fetchVisibleAdvertorials, fetchVisibleSponsoredLinks } from "./store/advertisements/thunk";
 
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -71,11 +72,14 @@ import GiftScreen from "./screens/GiftScreen";
 import RedeemGiftSubScreen from "./screens/RedeemGiftSubScreen";
 import CreateAdvertiseScreen from "./screens/CreateAdvertiseScreen";
 import EditAdvertiseScreen from "./screens/EditAdvertiseScreen";
-import { fetchAdvertisement } from "./store/advertisements/thunk";
 import AdvertisementScreen from "./screens/AdvertisementScreen";
 import AdvertisementTransactionScreen from "./screens/AdvertisementTransactionScreen";
 import AdvertorialScreen from "./screens/AdvertorialScreen";
 import FindYourAdvertisementScreen from "./screens/FindYourAdvertisementScreen";
+import MyAdvertisementListScreen from "./screens/MyAdvertisementListScreen";
+import ShopScreen from "./screens/ShopScreen";
+import { loadCurrentCurrency } from "./store/currency/actions";
+import MyTransactionsScreen from "./screens/MyTransactionsScreen";
 
 dayjs.extend(relativeTime);
 
@@ -85,6 +89,9 @@ function App() {
     const dispatch = useDispatch();
 
     const load = useCallback(async () => {
+        dispatch(loadCurrentCurrency());
+        dispatch(fetchVisibleAdvertorials());
+        dispatch(fetchVisibleSponsoredLinks());
         dispatch(fetchAdvertisement());
         dispatch(fetchWebsiteSettings());
         dispatch(fetchRates());
@@ -114,6 +121,14 @@ function App() {
                         <Route path="/create-advertisement" element={<CreateAdvertiseScreen />} />
                         <Route path="/advertisement/:advertisementId" element={<AdvertisementScreen />} />
                         <Route path="/find-your-advertisement" element={<FindYourAdvertisementScreen />} />
+                        <Route
+                            path="/my-advertisements"
+                            element={
+                                <AuthRoute>
+                                    <MyAdvertisementListScreen />
+                                </AuthRoute>
+                            }
+                        />
                         <Route path="/advertorial/:advertisementId" element={<AdvertorialScreen />} />
                         <Route
                             path="/advertisement-transaction/:advertisementId"
@@ -121,6 +136,7 @@ function App() {
                         />
                         <Route path="/edit-advertisement/:advertisementId" element={<EditAdvertiseScreen />} />
                         <Route path="/advertise-with-us" element={<AdvertiseWithUs />} />
+                        <Route path="/shop" element={<ShopScreen />} />
                         <Route path="/register" element={<RegisterScreen />} />
                         <Route path="/signin" element={<SigninScreen />} />
                         <Route
@@ -342,6 +358,15 @@ function App() {
                             element={
                                 <AuthRoute>
                                     <WithdrawRequestsScreen />
+                                </AuthRoute>
+                            }
+                        />
+
+                        <Route
+                            path="/transactions"
+                            element={
+                                <AuthRoute>
+                                    <MyTransactionsScreen />
                                 </AuthRoute>
                             }
                         />

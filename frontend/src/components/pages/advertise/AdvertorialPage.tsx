@@ -41,6 +41,7 @@ const AdvertorialPage: FC<AdvertorialPageProps> = ({ className = "", advertiseme
                         </div>
                         <a
                             href={advertisement.link}
+                            rel="noreferrer"
                             target="_blank"
                             className="text-accent underline uppercase tracking-widest underline-offset-2 text-lg"
                         >

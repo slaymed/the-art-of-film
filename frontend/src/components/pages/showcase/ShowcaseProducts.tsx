@@ -4,8 +4,8 @@ import classNames from "classnames";
 import { IShowcase } from "../../../store/showcase/types";
 import { selectShowcaseProduct } from "../../../store/showcase/actions";
 
-import FilterCard from "../../cards/FilterCard";
 import ShowcaseCarousel from "./ShowcaseCarousel";
+import AlphbetNumericFilter from "../../kits/AlphbetNumericFilter";
 
 import { useDispatch } from "../../../hooks/useDispatch";
 
@@ -34,18 +34,7 @@ const ShowcaseProducts: FC<ShowcaseProductsProps> = ({ className = "", showcase,
             {...rest}
             className={classNames("bg-base p-8 sm:p-16 flex flex-col gap-8 items-center", { [className]: className })}
         >
-            <div className="w-fit flex flex-wrap gap-3">
-                <FilterCard alphabet="All" filter={filter} onClick={() => updateFilter("All")} />
-                {Array.from(Array(26).keys()).map((index) => (
-                    <FilterCard
-                        key={index}
-                        alphabet={String.fromCharCode(index + 65)}
-                        filter={filter}
-                        onClick={() => updateFilter(String.fromCharCode(index + 65))}
-                    />
-                ))}
-                <FilterCard alphabet="0..9" filter={filter} onClick={() => updateFilter("0..9")} />
-            </div>
+            <AlphbetNumericFilter filter={filter} updateFilter={updateFilter} />
 
             {products.length > 0 && (
                 <div className="w-full">

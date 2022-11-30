@@ -1,5 +1,6 @@
-import React, { FC, ComponentProps, useState } from "react";
+import React, { FC, ComponentProps } from "react";
 import classNames from "classnames";
+
 import FilterCard from "../cards/FilterCard";
 
 export interface PaginatorProps extends ComponentProps<"div"> {

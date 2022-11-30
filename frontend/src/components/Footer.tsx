@@ -12,11 +12,11 @@ const Footer: FC<FooterProps> = ({ className = "", ...rest }) => {
     return (
         <footer {...rest} className={classNames("bg-footer ", { [className]: className })}>
             <div className="max-w-full overflow-x-auto scroll-bar">
-                <div className={classNames("py-10 flex justify-between px-4")}>
-                    <div className="flex-shrink-0 px-4 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5">
-                        <div className="border-b-2 border-accent h-full flex flex-col space-y-8 pb-4">
-                            <TextHeader className="text-3xl">Get In Touch</TextHeader>
-                            <div className="flex flex-col">
+                <div className="px-8 py-4 flex justify-between gap-16 flex-wrap">
+                    <div className="flex-shrink-0 w-fit">
+                        <div className="border-b-2 border-accent h-full flex flex-col gap-4 py-4">
+                            <TextHeader className="text-3xl text-accent">Get In Touch</TextHeader>
+                            <div className="flex flex-col gap-1">
                                 <div className="space-x-2">
                                     <i className="fa-solid fa-location-dot" />
                                     <span>London, UK</span>
@@ -27,7 +27,7 @@ const Footer: FC<FooterProps> = ({ className = "", ...rest }) => {
                                 </div>
                             </div>
 
-                            <div className="flex space-x-6 w-fit">
+                            <div className="flex gap-6 w-fit">
                                 <a href="https://www.facebook.com/Henry4film/" target="_blank" rel="noreferrer">
                                     <i className="text-blue-600/80 fa-brands fa-facebook" />
                                 </a>
@@ -50,66 +50,74 @@ const Footer: FC<FooterProps> = ({ className = "", ...rest }) => {
                             </div>
                         </div>
                     </div>
-                    <div className="flex-shrink-0 px-4 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5">
-                        <div className="border-b-2 border-accent h-full flex flex-col space-y-8 pb-4">
-                            <TextHeader className="text-3xl">Things to know</TextHeader>
-                            <div className="flex flex-col">
-                                <Link className="tracking-wider" to="/page/subscriptions">
+                    <div className="flex-shrink-0 w-fit">
+                        <div className="border-b-2 border-accent h-full flex flex-col gap-4 py-4">
+                            <TextHeader className="text-3xl text-accent">Things to know</TextHeader>
+                            <div className="flex flex-col gap-1">
+                                <Link
+                                    className="tracking-wider hover:text-accent duration-200"
+                                    to="/page/subscriptions"
+                                >
                                     Subscribe
                                 </Link>
-                                <Link to="/shop/posters/sold">Sold Posters</Link>
-                                <Link className="tracking-wider" to="/advertise-with-us">
+                                <Link to="/shop?filter=sold" className="tracking-wider hover:text-accent duration-200">
+                                    Sold Posters
+                                </Link>
+                                <Link className="tracking-wider hover:text-accent duration-200" to="/advertise-with-us">
                                     Advertise With Us
                                 </Link>
-                                <Link className="tracking-wider" to="/poster-grading-categories">
+                                <Link
+                                    className="tracking-wider hover:text-accent duration-200"
+                                    to="/poster-grading-categories"
+                                >
                                     Posters Condition Grading
                                 </Link>
-                                <Link className="tracking-wider" to="/terms">
+                                <Link className="tracking-wider hover:text-accent duration-200" to="/terms">
                                     Terms & Conditions
                                 </Link>
-                                <Link className="tracking-wider" to="/privacy">
+                                <Link className="tracking-wider hover:text-accent duration-200" to="/privacy">
                                     Privacy Policy
                                 </Link>
                             </div>
                         </div>
                     </div>
-                    <div className="flex-shrink-0 px-4 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5">
-                        <div className="border-b-2 border-accent h-full flex flex-col space-y-8 pb-4">
-                            <TextHeader className="text-3xl">Site-map</TextHeader>
-                            <div className="flex flex-col">
-                                <Link className="tracking-wider" to="/">
+                    <div className="flex-shrink-0 w-fit">
+                        <div className="border-b-2 border-accent h-full flex flex-col gap-4 py-4">
+                            <TextHeader className="text-3xl text-accent">Site-map</TextHeader>
+                            <div className="flex flex-col gap-1">
+                                <Link className="tracking-wider hover:text-accent duration-200" to="/">
                                     Home
                                 </Link>
                                 {/* <Link to="/about-us">About Us</Link> */}
-                                <Link className="tracking-wider" to="/shop/name">
+                                <Link className="tracking-wider hover:text-accent duration-200" to="/shop">
                                     Shop
                                 </Link>
-                                <Link className="tracking-wider" to="/sellers">
+                                <Link className="tracking-wider hover:text-accent duration-200" to="/sellers">
                                     Showcase
                                 </Link>
-                                <Link className="tracking-wider" to="/faq">
+                                <Link className="tracking-wider hover:text-accent duration-200" to="/faq">
                                     FAQs
                                 </Link>
                                 {/* <Link to="/contact">Contact</Link> */}
                             </div>
                         </div>
                     </div>
-                    <div className="flex-shrink-0 px-4 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5">
-                        <div className="border-b-2 border-accent h-full flex flex-col space-y-8 pb-4">
-                            <TextHeader className="text-3xl">NEWS & BLOG FEED</TextHeader>
-                            <div className="flex flex-col">
-                                <Link className="tracking-wider" to="/grahamhumpreys">
+                    <div className="flex-shrink-0 w-fit">
+                        <div className="border-b-2 border-accent h-full flex flex-col gap-4 py-4">
+                            <TextHeader className="text-3xl text-accent">NEWS & BLOG FEED</TextHeader>
+                            <div className="flex flex-col gap-1">
+                                <Link className="tracking-wider hover:text-accent duration-200" to="/grahamhumpreys">
                                     Graham Humphreys
                                 </Link>
-                                <Link className="tracking-wider" to="/why-film-posters">
+                                <Link className="tracking-wider hover:text-accent duration-200" to="/why-film-posters">
                                     Why Film Posters?
                                 </Link>
                             </div>
                         </div>
                     </div>
-                    <div className="flex-shrink-0 px-4 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5">
-                        <div className="border-b-2 border-accent h-full flex flex-col space-y-8 pb-4">
-                            <TextHeader className="text-3xl">Insta Feeds</TextHeader>
+                    <div className="flex-shrink-0 w-fit">
+                        <div className="border-b-2 border-accent h-full flex flex-col gap-4 py-4">
+                            <TextHeader className="text-3xl text-accent">Insta Feeds</TextHeader>
                             <div>
                                 <InstagramFeed
                                     token={

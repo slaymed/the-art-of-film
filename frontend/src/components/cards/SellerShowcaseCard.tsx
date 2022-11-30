@@ -14,7 +14,10 @@ const SellerShowcaseCard: FC<SellerShowcaseCardProps> = ({ className = "", selle
         <div {...rest} className={classNames("bg-base p-4 w-full max-w-[300px]", { [className]: className })}>
             <ul className="bg-light-dark flex space-y-8 flex-col p-8 w-full items-center">
                 <li>
-                    <Link className="text-2xl tracking-widest text-center text-accent" to={`/seller/${seller._id}`}>
+                    <Link
+                        className="text-2xl tracking-widest line-clamp-1 text-center text-accent"
+                        to={`/seller/${seller._id}`}
+                    >
                         {seller.name}
                     </Link>
                 </li>
@@ -24,10 +27,10 @@ const SellerShowcaseCard: FC<SellerShowcaseCardProps> = ({ className = "", selle
                         <div className="flex space-x-0.4">
                             <span style={{ fontSize: "2.5rem" }}>
                                 <img
-                                    width="32px"
+                                    width={32}
                                     src={
                                         seller.code
-                                            ? `https://countryflagsapi.com/png/${seller.code}`
+                                            ? `https://flagcdn.com/${seller.code.toLowerCase()}.svg`
                                             : "https://upload.wikimedia.org/wikipedia/commons/b/b0/No_flag.svg"
                                     }
                                     alt={seller.name}

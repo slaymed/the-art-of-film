@@ -2,7 +2,7 @@ import React, { FC, ComponentProps } from "react";
 import classNames from "classnames";
 
 import { Advertisement } from "../../../store/advertisements/types";
-import Paragraph from "../../elements/Paragraph";
+
 import TextHeader from "../../elements/TextHeader";
 
 export interface SponsoredLinkPageProps extends ComponentProps<"div"> {
@@ -29,7 +29,7 @@ const SponsoredLinkPage: FC<SponsoredLinkPageProps> = ({
             <div className="flex flex-col md:flex-row md:justify-between gap-8">
                 <div className="flex flex-col w-full md:w-2/3">
                     <div className="w-full">
-                        <a href={advertisement.link} target="_blank">
+                        <a href={advertisement.link} target="_blank" rel="noreferrer">
                             <img
                                 src={advertisement.image}
                                 alt="Sponsored Link"
@@ -41,6 +41,7 @@ const SponsoredLinkPage: FC<SponsoredLinkPageProps> = ({
                 <div className="flex flex-col w-full md:w-1/3 gap-8">
                     <a
                         href={advertisement.link}
+                        rel="noreferrer"
                         target="_blank"
                         className="text-accent underline uppercase tracking-widest underline-offset-2 text-lg"
                     >

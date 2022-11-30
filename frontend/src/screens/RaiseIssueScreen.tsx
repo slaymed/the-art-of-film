@@ -1,21 +1,22 @@
 import React, { FC, ComponentProps, useState, FormEvent } from "react";
 import classNames from "classnames";
-import H1 from "../components/elements/H1";
+import { useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+
 import Paragraph from "../components/elements/Paragraph";
 import AppInput from "../components/elements/AppInput";
-import { useSelector } from "react-redux";
-import { raisingIssue } from "../store/issues/selectors";
 import LoadingBox from "../components/kits/LoadingBox";
-import MessageBox from "../components/kits/MessageBox";
 import Button from "../components/elements/Button";
 import TextHeader from "../components/elements/TextHeader";
-import { useNavigate, useParams } from "react-router-dom";
-import { raiseIssue } from "../store/issues/thunks";
-import { useDispatch } from "../hooks/useDispatch";
-import { GlobalMessage, ThunkResponseType } from "../store/types";
-import { IIssue } from "../store/issues/types";
-import { RequestLifeCycle } from "../store/enums";
 import ErrorWithRedirect from "../components/kits/ErrorWithRedirect";
+
+import { raisingIssue } from "../store/issues/selectors";
+import { raiseIssue } from "../store/issues/thunks";
+import { RequestLifeCycle } from "../store/enums";
+import { IIssue } from "../store/issues/types";
+import { GlobalMessage, ThunkResponseType } from "../store/types";
+
+import { useDispatch } from "../hooks/useDispatch";
 
 export interface RaiseIssueScreenProps extends ComponentProps<"div"> {}
 

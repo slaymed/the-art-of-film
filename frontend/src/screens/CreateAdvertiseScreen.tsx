@@ -1,16 +1,19 @@
 import React, { FC, ComponentProps, useState, Fragment, useEffect } from "react";
 import classNames from "classnames";
-import TextHeader from "../components/elements/TextHeader";
+import { useSelector } from "react-redux";
 import { Tab } from "@headlessui/react";
 import { useSearchParams } from "react-router-dom";
+
 import { AdvertisementType } from "../store/advertisements/enums";
-import CreateEditAdvertiseForm from "../components/forms/CreateEditAdvertiseForm";
 import { CreateEditAdvertiseVars } from "../store/advertisements/types";
-import { useSelector } from "react-redux";
 import { websiteSettings } from "../store/settings/selectors";
-import { useDispatch } from "../hooks/useDispatch";
 import { resetCreateAdvertiseErrors } from "../store/advertisements/actions";
+
+import { useDispatch } from "../hooks/useDispatch";
+
 import Page from "../components/pages/Page";
+import CreateEditAdvertiseForm from "../components/forms/CreateEditAdvertiseForm";
+import TextHeader from "../components/elements/TextHeader";
 
 export interface CreateAdvertiseScreenProps extends ComponentProps<"div"> {}
 
@@ -45,7 +48,7 @@ const CreateAdvertiseScreen: FC<CreateAdvertiseScreenProps> = ({ className = "",
             default:
                 setTabIndex(0);
         }
-    }, [usp, setTabIndex]);
+    }, [dispatch, pannel]);
 
     return (
         <Page {...rest} className={className}>

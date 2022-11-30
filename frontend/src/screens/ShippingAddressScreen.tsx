@@ -6,17 +6,17 @@ import Select from "react-select";
 
 import { useDispatch } from "../hooks/useDispatch";
 
-import data, { countrySelectDefaultOption, countrySelectOptions } from "../data";
+import { countrySelectDefaultOption, countrySelectOptions } from "../data";
 
 import { user } from "../store/auth/selectors";
 import { updateCartShippingAddress } from "../store/cart/thunks";
+import { Address } from "../store/auth/types";
 
 import CheckoutSteps from "../components/kits/CheckoutSteps";
 import H1 from "../components/elements/H1";
 import Button from "../components/elements/Button";
 import TextHeader from "../components/elements/TextHeader";
 import AppInput from "../components/elements/AppInput";
-import { Address } from "../store/auth/types";
 
 export interface ShippingAddressScreenProps extends ComponentProps<"div"> {}
 

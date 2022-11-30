@@ -14,6 +14,7 @@ import { clearCart } from "../store/cart/thunks";
 import { cartData, clearingCart } from "../store/cart/selectors";
 
 import { useDispatch } from "../hooks/useDispatch";
+import CartItemCard from "../components/cards/CartItemCard";
 
 export interface CartScreenProps extends ComponentProps<"div"> {}
 
@@ -34,7 +35,7 @@ const CartScreen: FC<CartScreenProps> = ({ className = "", ...rest }) => {
         return (
             <div className="flex items-center justify-center p-16 space-x-2 text-xl bg-light-dark">
                 <MessageBox className="!text-xl">Cart is empty.</MessageBox>
-                <Link to="/shop/name">
+                <Link to="/shop">
                     <Paragraph className="tracking-wider underline text-accent">Go Shopping</Paragraph>
                 </Link>
             </div>
@@ -60,21 +61,7 @@ const CartScreen: FC<CartScreenProps> = ({ className = "", ...rest }) => {
             <div className="flex flex-col space-y-8 lg:space-y-0 lg:flex-row lg:space-x-8">
                 <div className="flex flex-col w-full scroll-bar space-y-4 overflow-y-auto max-h-[600px]">
                     {cart.items.map((item) => (
-                        <div key={item._id} className="flex items-center justify-between space-x-4">
-                            <div className="flex items-center justify-center flex-shrink-0 w-20 h-12 md:w-24 lg:w-28 md:h-16 lg:h-20">
-                                <img src={item.image} alt={item.name} className="max-w-full max-h-full" />
-                            </div>
-
-                            <Link to={`/product/${item._id}`}>
-                                <Paragraph className="text-sm line-clamp-1">{item.name}</Paragraph>
-                            </Link>
-
-                            <Paragraph className="text-sm line-clamp-1">
-                                <CurrencyConvert amount={item.price} />
-                            </Paragraph>
-
-                            <button className="px-4 py-2 text-black bg-white">Delete</button>
-                        </div>
+                        <CartItemCard key={item._id} item={item} />
                     ))}
                 </div>
 

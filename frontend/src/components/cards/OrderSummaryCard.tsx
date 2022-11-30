@@ -6,7 +6,6 @@ import { GlobalMessage } from "../../store/types";
 import TextHeader from "../elements/TextHeader";
 import Button from "../elements/Button";
 
-import MessageBox from "../kits/MessageBox";
 import LoadingBox from "../kits/LoadingBox";
 import Paragraph from "../elements/Paragraph";
 import CurrencyConvert from "../kits/CurrencyConvert";
@@ -74,7 +73,7 @@ const OrderSummaryCard: FC<OrderSummaryCardProps> = ({
                     className={classNames("p-3 text-black bg-accent", {
                         "!bg-white/70": length === 0,
                     })}
-                    disabled={length === 0}
+                    disabled={length === 0 || loading}
                 >
                     {buttonText}
                 </Button>

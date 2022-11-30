@@ -2,180 +2,15 @@ import express from "express";
 import expressAsyncHandler from "express-async-handler";
 import data from "../data.js";
 import { available } from "../helpers/available.js";
+import Artist from "../models/artistModel.js";
+import Cast from "../models/castModel.js";
+import Director from "../models/directorModel.js";
 import Product from "../models/productModel.js";
 import User from "../models/userModel.js";
-import { isAuth } from "../utils.js";
+import { getUser, isAuth, is_subscribed } from "../utils.js";
 import { syncArtistes, syncCasts, syncDirectors } from "./tagsRouter.js";
 
 const productRouter = express.Router();
-
-// Filters
-productRouter.get(
-    "/search",
-    expressAsyncHandler(async (req, res) => {
-        try {
-            const { query } = req;
-
-            const name = query.name !== undefined ? query.name : "";
-            const directors = query.directors !== undefined && query.directors !== "" ? [query.directors] : [];
-            const casts = query.casts !== undefined && query.casts !== "" ? [query.casts] : [];
-            const artists = query.artists !== undefined && query.artists !== "" ? [query.artists] : [];
-            const origin = query.origin !== undefined ? query.origin : "";
-            const format = query.format !== undefined ? query.format : "";
-            const rolledFolded = query.rolledFolded !== undefined ? query.rolledFolded : "";
-            const condition = query.condition !== undefined ? query.condition : "";
-            const price = query.price !== undefined ? query.price : "";
-            const sold = query.sold !== undefined ? query.sold : false;
-
-            if (name !== "") {
-                var nameFilter =
-                    name && name !== ""
-                        ? {
-                              name: {
-                                  $regex: name,
-                                  $options: "i",
-                              },
-                          }
-                        : {};
-            }
-
-            if (directors && directors.length > 0) {
-                var directorFilter =
-                    directors && directors.length > 0
-                        ? {
-                              directors: {
-                                  $in: directors,
-                              },
-                          }
-                        : {};
-            }
-
-            if (casts && casts.length > 0) {
-                var castFilter =
-                    casts && casts.length > 0
-                        ? {
-                              casts: {
-                                  $in: casts,
-                              },
-                          }
-                        : {};
-            }
-
-            if (artists && artists.length > 0) {
-                var artistFilter =
-                    artists && artists.length > 0
-                        ? {
-                              artists: {
-                                  $in: artists,
-                              },
-                          }
-                        : {};
-            }
-
-            if (origin !== "") {
-                var originFilter =
-                    origin && origin !== ""
-                        ? {
-                              origin: {
-                                  $regex: origin,
-                                  $options: "i",
-                              },
-                          }
-                        : {};
-            }
-
-            if (format !== "") {
-                var formatFilter =
-                    format && format !== ""
-                        ? {
-                              format: {
-                                  $regex: format,
-                                  $options: "i",
-                              },
-                          }
-                        : {};
-            }
-
-            if (rolledFolded !== "") {
-                var rolledFoldedFilter =
-                    rolledFolded && rolledFolded !== ""
-                        ? {
-                              rolledFolded: {
-                                  $regex: rolledFolded,
-                                  $options: "i",
-                              },
-                          }
-                        : {};
-            }
-
-            if (condition !== "") {
-                var conditionFilter =
-                    condition && condition !== ""
-                        ? {
-                              condition: {
-                                  $regex: condition,
-                                  $options: "i",
-                              },
-                          }
-                        : {};
-            }
-
-            if (price !== "") {
-                var priceFilter =
-                    price && price !== 0
-                        ? {
-                              price: {
-                                  $gte: Number(price.split("-")[0]),
-                                  $lte: Number(price.split("-")[1]),
-                              },
-                          }
-                        : {};
-            }
-
-            if (sold !== "") {
-                var soldFilter =
-                    sold && sold !== ""
-                        ? {
-                              sold: {
-                                  $eq: Boolean(sold),
-                              },
-                          }
-                        : {};
-            }
-
-            const filters = {
-                ...nameFilter,
-                ...directorFilter,
-                ...castFilter,
-                ...artistFilter,
-                ...originFilter,
-                ...formatFilter,
-                ...rolledFoldedFilter,
-                ...conditionFilter,
-                ...priceFilter,
-                ...soldFilter,
-            };
-
-            const products = await Product.find({ ...filters })
-                .populate("seller", "seller")
-                .sort({ createdAt: -1 })
-                .where("forSale", true)
-                .where("visible", true);
-
-            const filteredProducts = [];
-
-            for (const product of products) {
-                if (!product.seller) continue;
-                product.seller = product.seller._id;
-                filteredProducts.push(product);
-            }
-
-            return res.status(200).json({ products: filteredProducts, countProducts: 0 });
-        } catch (error) {
-            return res.status(500).json(error);
-        }
-    })
-);
 
 productRouter.get(
     "/list/home",
@@ -189,7 +24,8 @@ productRouter.get(
                 .populate("seller")
                 .populate("directors")
                 .populate("casts")
-                .populate("artists");
+                .populate("artists")
+                .limit(6);
 
             const sortedList = products.sort((a, b) => a.name.localeCompare(b.name));
 
@@ -201,86 +37,66 @@ productRouter.get(
     })
 );
 
-productRouter.get(
-    "/",
+productRouter.post(
+    "/shop/search",
     expressAsyncHandler(async (req, res) => {
         try {
-            const pageSize = 6;
-            const page = +req.query.pageNumber || 1;
-            const count = await Product.count({
-                forSale: true,
-                visible: true,
-                sold: false,
-            }).exec();
+            let { query = {}, requestedPageNumber, itemsPerPage } = req.body;
+            const { name, director, cast, artist, origin, format, year, condition, price, filter } = query;
 
-            const products = await Product.find()
-                .sort({ createdAt: -1 })
-                .where("forSale", true)
-                .where("visible", true)
-                .where("sold", false)
-                .limit(pageSize)
-                .skip(pageSize * (page - 1))
-                .populate("seller", "seller.name seller.logo")
-                .populate("directors")
-                .populate("casts")
-                .populate("artists")
-                .then((products) => {
-                    const sorted_alphabetically = products.sort((a, b) => a.name.localeCompare(b.name));
-                    return sorted_alphabetically;
-                });
-            return res.status(200).json({ products, count, page, pages: Math.ceil(count / pageSize) });
-        } catch (error) {
-            return res.status(500).json(error);
-        }
-    })
-);
+            const filters = {};
 
-productRouter.get(
-    "/seller/:id",
-    expressAsyncHandler(async (req, res) => {
-        try {
-            const pageSize = 6;
-            const page = +req.query.pageNumber || 1;
-            const sold = req.query.sold || false;
-            const showcase = req.query.showcase || false;
-
-            const count = await Product.count({ seller: req.params.id, sold }).exec();
-
-            if (showcase === "true") {
-                const products = await Product.find({ seller: req.params.id })
-                    .sort({ createdAt: -1 })
-                    .where("visible", true)
-                    .where("sold", false)
-                    // .limit(pageSize)
-                    // .skip(pageSize * (page - 1))
-                    .populate("seller", "seller.name seller.logo")
-                    .populate("directors", "name")
-                    .populate("casts", "name")
-                    .populate("artists", "name")
-                    .then((products) => {
-                        const sorted_alphabetically = products.sort((a, b) => a.name.localeCompare(b.name));
-                        return sorted_alphabetically;
-                    });
-
-                return res.status(200).json({ products, page, pages: Math.ceil(count / pageSize) });
-            } else {
-                const products = await Product.find({ seller: req.params.id })
-                    .sort({ createdAt: -1 })
-                    .where("sold", false)
-                    .limit(pageSize)
-                    .skip(pageSize * (page - 1))
-                    .populate("seller", "seller.name seller.logo")
-                    .populate("directors")
-                    .populate("casts")
-                    .populate("artists")
-                    .then((products) => {
-                        const sorted_alphabetically = products.sort((a, b) => a.name.localeCompare(b.name));
-                        return sorted_alphabetically;
-                    });
-
-                return res.status(200).json({ products, page, pages: Math.ceil(count / pageSize) });
+            if (name) filters.name = { $regex: name, $options: "i" };
+            if (director) {
+                const syncedDirector = await Director.findOne({ name: { $regex: director, $options: "i" } });
+                if (syncedDirector) filters.directors = { $in: syncedDirector._id };
             }
+            if (cast) {
+                const syncedCast = await Cast.findOne({ name: { $regex: cast, $options: "i" } });
+                if (syncedCast) filters.casts = { $in: syncedCast._id };
+            }
+            if (artist) {
+                const syncedArtist = await Artist.findOne({ name: { $regex: artist, $options: "i" } });
+                if (syncedArtist) filters.artists = { $in: syncedArtist._id };
+            }
+            if (origin) filters.origin = { $regex: origin, $options: "i" };
+            if (format) filters.format = { $regex: format, $options: "i" };
+            if (year) filters.year = { $eq: parseInt(year) };
+            if (condition) filters.condition = { $regex: condition, $options: "i" };
+            if (price) filters.price = { $gte: Number(price.split("-")[0]), $lte: Number(price.split("-")[1]) };
+            filters.sold = { $eq: filter === "sold" };
+
+            const products = await Product.find(filters)
+                .populate("seller")
+                .sort({ createdAt: -1, name: 1 })
+                .where("forSale", true)
+                .where("visible", true);
+
+            for (let i = 0; i < products.length; i += 1) {
+                const product = products[i];
+                const subscribed = await is_subscribed(product.seller);
+                if (subscribed) continue;
+                products.splice(i, 1);
+                i -= 1;
+            }
+
+            let totalCount = products.length;
+            if (totalCount === 0) return res.status(404).json({ message: "No Poster Found" });
+            if (itemsPerPage > totalCount) itemsPerPage = totalCount;
+            const pagesCount = Math.ceil(totalCount / itemsPerPage);
+            if (requestedPageNumber > pagesCount) requestedPageNumber = pagesCount;
+            const skip = itemsPerPage * (requestedPageNumber - 1);
+
+            const resData = {
+                products: products.slice(skip, itemsPerPage),
+                pagesCount,
+                totalCount,
+                currentPage: requestedPageNumber,
+            };
+
+            return res.status(200).json(resData);
         } catch (error) {
+            console.log(error);
             return res.status(500).json(error);
         }
     })
@@ -352,16 +168,22 @@ productRouter.get(
 );
 
 productRouter.get(
-    "/:id",
+    "/:productId",
     expressAsyncHandler(async (req, res) => {
         try {
-            const product = await Product.findById(req.params.id)
+            const { productId } = req.params;
+
+            const errMsg = { message: "Product Not Found" };
+
+            if (typeof productId !== "string" || productId.length < 24) return res.status(404).json(errMsg);
+
+            const product = await Product.findById(productId)
                 .populate("seller")
                 .populate("directors")
                 .populate("casts")
                 .populate("artists");
 
-            if (!product) return res.status(404).json({ message: "Product Not Found" });
+            if (!product) return res.status(404).json(errMsg);
 
             return res.json(product);
         } catch (error) {

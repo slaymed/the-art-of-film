@@ -2,7 +2,6 @@ import React, { FC, ComponentProps } from "react";
 import classNames from "classnames";
 
 import { Advertisement } from "../../../store/advertisements/types";
-import Paragraph from "../../elements/Paragraph";
 import TextHeader from "../../elements/TextHeader";
 
 export interface AdvertisementBannerPageProps extends ComponentProps<"div"> {
@@ -27,7 +26,7 @@ const AdvertisementBannerPage: FC<AdvertisementBannerPageProps> = ({
             )}
 
             <div className="w-full">
-                <a href={advertisement.link} target="_blank">
+                <a href={advertisement.link} target="_blank" rel="noreferrer">
                     <img
                         src={advertisement.image}
                         alt="Sponsored Link"
@@ -39,6 +38,7 @@ const AdvertisementBannerPage: FC<AdvertisementBannerPageProps> = ({
             <a
                 href={advertisement.link}
                 target="_blank"
+                rel="noreferrer"
                 className="text-accent underline uppercase tracking-widest underline-offset-2 text-lg"
             >
                 {advertisement.link}

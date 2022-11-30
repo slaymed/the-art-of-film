@@ -32,7 +32,7 @@ const SubscribePage: FC<SubscribePageProps> = ({ className = "", ...rest }) => {
 
     return (
         <div {...rest} className={classNames("flex flex-col space-y-8", { [className]: className })}>
-            <Paragraph className="text-lg sm:text-xl uppercase text-accent tracking-widest font-bold">
+            <Paragraph className="text-lg sm:text-xl uppercase text-slate-400 tracking-widest font-bold">
                 Subscribe
             </Paragraph>
 

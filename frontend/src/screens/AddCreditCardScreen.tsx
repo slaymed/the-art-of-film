@@ -1,6 +1,6 @@
 import React, { FC, ComponentProps, FormEvent, useState, useRef, useCallback, ChangeEvent, useEffect } from "react";
 import classNames from "classnames";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import { countrySelectOptions } from "../data";
@@ -12,6 +12,7 @@ import AppSwitch from "../components/elements/AppSwitch";
 import Button from "../components/elements/Button";
 import MessageBox from "../components/kits/MessageBox";
 import LoadingBox from "../components/kits/LoadingBox";
+import Page from "../components/pages/Page";
 
 import { CreditCardErrors, ICreditCard, PaymentMethodAddress } from "../store/payment-methods/types";
 import { addingCreditCard } from "../store/payment-methods/selectors";
@@ -19,7 +20,6 @@ import { addCreditCard } from "../store/payment-methods/thunks";
 import { ThunkResponseType } from "../store/types";
 import { RequestLifeCycle } from "../store/enums";
 import { user } from "../store/auth/selectors";
-import Page from "../components/pages/Page";
 
 const addressInitialState: PaymentMethodAddress = {
     city: "",
@@ -38,6 +38,8 @@ const AddCreditCardScreen: FC<AddCreditCardScreenProps> = ({ className = "", ...
 
     const { loading, errors } = useSelector(addingCreditCard);
     const userInfo = useSelector(user);
+
+    const [sp] = useSearchParams();
 
     const [cardNumber, setCardNumber] = useState({ first4: "", second4: "", third4: "", forth4: "" });
     const [cardDate, setCardDate] = useState({ exp_month: "", exp_year: "" });
@@ -63,22 +65,10 @@ const AddCreditCardScreen: FC<AddCreditCardScreenProps> = ({ className = "", ...
 
         if (value.length <= 4) setCardNumber((prev) => ({ ...prev, [name]: value }));
 
-        switch (name) {
-            case "first4":
-                if (value.length > 3) second4InputRef.current?.focus();
-                break;
-            case "second4":
-                if (value.length > 3) third4InputRef.current?.focus();
-                break;
-            case "third4":
-                if (value.length > 3) forth4InputRef.current?.focus();
-                break;
-            case "forth4":
-                if (value.length > 3) cvcInputRef.current?.focus();
-                break;
-            default:
-                return;
-        }
+        if (name === "first4" && value.length > 3) second4InputRef.current?.focus();
+        if (name === "second4" && value.length > 3) third4InputRef.current?.focus();
+        if (name === "third4" && value.length > 3) forth4InputRef.current?.focus();
+        if (name === "forth4" && value.length > 3) cvcInputRef.current?.focus();
     }, []);
 
     const handleCvcChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
@@ -92,17 +82,14 @@ const AddCreditCardScreen: FC<AddCreditCardScreenProps> = ({ className = "", ...
         const name = event.target.name;
         const value = event.target.value;
 
-        switch (name) {
-            case "exp_month":
-                if (value.length <= 2) setCardDate((prev) => ({ ...prev, [name]: value }));
-                if (value.length > 1) expYearInputRef.current?.focus();
-                break;
-            case "exp_year":
-                if (value.length <= 4) setCardDate((prev) => ({ ...prev, [name]: value }));
-                if (value.length > 3) cardNameInputRef.current?.focus();
-                break;
-            default:
-                return;
+        if (name === "exp_month") {
+            if (value.length <= 2) setCardDate((prev) => ({ ...prev, [name]: value }));
+            if (value.length > 1) expYearInputRef.current?.focus();
+        }
+
+        if (name === "exp_year") {
+            if (value.length <= 4) setCardDate((prev) => ({ ...prev, [name]: value }));
+            if (value.length > 3) cardNameInputRef.current?.focus();
         }
     }, []);
 
@@ -117,7 +104,7 @@ const AddCreditCardScreen: FC<AddCreditCardScreenProps> = ({ className = "", ...
 
         if (useAccountName) setCardName(userInfo.name);
         if (!useAccountName) setCardName("");
-    }, [useAccountName]);
+    }, [useAccountName, userInfo]);
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -140,7 +127,7 @@ const AddCreditCardScreen: FC<AddCreditCardScreenProps> = ({ className = "", ...
         const { status } = res.payload as ThunkResponseType<ICreditCard[], CreditCardErrors>;
         if (status !== RequestLifeCycle.SUCCESS) return;
 
-        navigate("/payment-methods/credit-cards");
+        navigate(sp.get("redirect") || "/payment-methods/credit-cards");
     };
 
     return (

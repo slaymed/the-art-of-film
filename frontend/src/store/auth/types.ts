@@ -46,10 +46,7 @@ export interface RegisterVars extends SignInVars {
     sellerName: string;
 }
 
-export interface UpdateUserVars extends Partial<User> {
-    password?: string;
-    confirm_pasword?: string;
-}
+export interface UpdateUserVars extends Partial<User> {}
 
 export interface SigninErrors extends Partial<SignInVars>, GlobalMessage {}
 export interface RegisterErrors extends Partial<RegisterVars>, GlobalMessage {}

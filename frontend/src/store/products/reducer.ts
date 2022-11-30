@@ -5,7 +5,7 @@ import { globalMessage } from "../initial-state";
 import { GlobalMessage, ThunkResponseType } from "../types";
 import { ProductsInitialState } from "./initial-state";
 import { create_edit_product_shared_operation, fetchingProductsSharedOperations } from "./shared-operations";
-import { deletePoster, fetchProduct } from "./thunks";
+import { deletePoster, fetchSelectedProduct } from "./thunks";
 import { IProduct } from "./types";
 
 const slice = createSlice({
@@ -13,14 +13,14 @@ const slice = createSlice({
     initialState: ProductsInitialState,
     reducers: {},
     extraReducers({ addCase }) {
-        for (const { thunk, targetedValue, updateKey } of fetchingProductsSharedOperations) {
+        for (const { thunk, targetValue, updateKey } of fetchingProductsSharedOperations) {
             addCase(thunk.pending, (products) => {
                 products[updateKey].loading = true;
             });
             addCase(thunk.fulfilled, (products, { payload }) => {
                 const { data: list } = payload;
 
-                products[targetedValue] = list;
+                products[targetValue] = list;
                 products[updateKey].loading = false;
                 products[updateKey].errors = globalMessage;
             });
@@ -75,17 +75,17 @@ const slice = createSlice({
             products.remove.loading = false;
         });
 
-        addCase(fetchProduct.pending, (products) => {
+        addCase(fetchSelectedProduct.pending, (products) => {
             products.fetchingSelectedProduct.loading = true;
         });
-        addCase(fetchProduct.fulfilled, (products, { payload }) => {
+        addCase(fetchSelectedProduct.fulfilled, (products, { payload }) => {
             const { data: poster } = payload;
 
             products.selectedProduct = poster;
             products.fetchingSelectedProduct.loading = false;
             products.fetchingSelectedProduct.errors = globalMessage;
         });
-        addCase(fetchProduct.rejected, (products, { payload }) => {
+        addCase(fetchSelectedProduct.rejected, (products, { payload }) => {
             const { errors } = payload as ThunkResponseType<IProduct[], GlobalMessage>;
 
             if (errors) products.fetchingSelectedProduct.errors = errors;
